@@ -1,0 +1,56 @@
+## namespaces
+
+    namespace :web_server do
+
+      task :backup do
+        puts "In Example Backup Web-Server"
+      end
+
+    end
+
+    task :default => 'web_server:backup'
+
+rake -T => web_server:backup         Backup Web Server
+
+## arguments in tasks
+
+    task :do_release, [:release_name] do |t,args|
+      name = args[:release_name]
+      puts "argument was: #{name}"
+    end
+
+## default-arguments in tasks
+
+    task :flash_cam, :cam_address do |t, args|
+      args.with_defaults(:cam_address => TargetCam)
+      sh "this is my address:#{args.cam_address}"
+    end
+
+## find out os
+
+    module OS
+      def OS.windows?
+        (RUBY_PLATFORM =~ /cygwin|mswin|mingw|bccwin|wince|emx/) != nil
+      end
+      def OS.mac?
+        (RUBY_PLATFORM =~ /darwin/) != nil
+      end
+      def OS.unix?
+        !OS.windows?
+      end
+      def OS.linux?
+        OS.unix? and not OS.mac?
+      end
+    end
+
+## benchmarking
+
+
+    require 'benchmark'
+
+    task :prof => [:clean,ProfilingExecutable] do
+      benchmark = Benchmark.realtime do
+        ... do s.th. ...
+      end
+      puts "computing step took: " + sprintf("%.2f", benchmark)
+    end

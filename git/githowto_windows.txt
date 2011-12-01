@@ -1,0 +1,5 @@
+# connect to net drive
+net use r: \\linuxbox\gitrepos\
+# clone git repo
+# r looks has folder workspace.rdiag
+git clone r:\workspace.rdiag rdiag

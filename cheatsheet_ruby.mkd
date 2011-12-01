@@ -1,0 +1,11 @@
+
+# ruby gems
+
+### installing gems:
+
+sudo gem install rake -i /usr/local/lib/ruby
+
+### uninstall:
+
+sudo gem uninstall rake -i /usr/local/lib/ruby
+

@@ -1,0 +1,27 @@
+## ssh-add
+
+### list all keys for ssh-add
+
+    $ ssh-add -l
+
+### add ssh key so not only id_rsa etc. is tried:
+
+    $ ssh-add path/to/key
+
+### You may also need to update the permissions on your .ssh folder and its contents. The SSH application will ignore secret files that are too permissive.
+
+    $ chmod 700 ~/.ssh
+    $ chmod 600 ~/.ssh/*
+
+## SSH keys
+
+### generate new key
+
+    $ ssh-keygen -t rsa -C "omueller@testkey"
+
+### re-generate pubic key from private key
+
+    $ ssh-keygen -y -f private.key
+
+
+

@@ -1,0 +1,545 @@
+## compare files/folders from different branches
+
+    $ git diff branchA:folderA branchB:folderB
+
+## what files that are different between the two branches
+
+    $ git diff --name-status master..branch
+
+## search Git branches for a file or directory
+
+    $ git log --all -- somefile
+
+## add all files to git that match a pattern and have been changed:
+
+    $ git ls-files -m | ack meta | xargs -n1 git add
+
+## git interactive rebase
+
+### How do I copy a version of a single file from one git branch to another?
+
+    $ git checkout otherbranch myfile.txt
+
+### show all untracked files
+
+    $ git ls-files --others --exclude-standard
+
+### revert last commit
+
+    $ git revert 
+
+### Checkout sub directories in git (sparse checkouts)
+
+
+1. clone the other repository (in my case, for a Rails app, I did it in vendor/plugins/)
+
+    $ git clone <repository_url> <directory>
+
+2. cd to <directory>
+
+    $ cd <directory>
+
+3. enable sparsecheckout
+
+    $ git config core.sparsecheckout true
+
+4. add directories you want to have in your checkout to .git/info/sparse-checkout, e.g.
+
+    $ echo app/models/ > .git/info/sparse-checkout
+    $ echo lib/ >> .git/info/sparse-checkout
+
+5. run read-tree
+
+    git read-tree -m -u HEAD
+
+### split commit
+
+    $ git reset HEAD^
+    $ git add file1
+    $ git commit 'first part of split commit'
+    $ git add file2
+    $ git commit 'second part of split commit'
+    $ git rebase --continue
+
+## git submodules
+
+### remove a submodule
+
+Delete the relevant line from the .gitmodules file.
+Delete the relevant section from .git/config.
+Run git rm --cached path_to_submodule (no trailing slash).
+Commit and delete the now untracked submodule files.
+
+## abort merge
+
+    git reset --hard HEAD
+
+The simplest way to resolve the conflict to use the remote version verbatim is:
+
+    git checkout --theirs _widget.html.erb
+
+## ignore files
+------ use shell-style globs (e.g. *.o) in either .git/info/exclude or .gitignore.  ------
+.git/info/exclude :   local to your repository only, and not shared by others who might fetch from your repository.
+.gitignore        :   more commonly used, as it can be checked into the repository and thereby automatically shared with all users of the project. 
+
+
+## setup remote using ssh
+git remote add server ssh://oliver@172.16.219.128/home/oliver/dev/git/railsapps.git
+
+* log onto remote machine: ssh linuxmuc2
+* on remote machine: git clone git://test.repos.org/test.git
+* on local machine:  git clone linuxmuc2:dev/git/x264 x264.git
+
+## making sure your SSH key is found
+
+    $ ssh-add path/to/key
+
+
+## reuse commit message
+
+-C <commit>
+    Take an existing commit object, and reuse the log message and the authorship information (including the timestamp) when creating the commit.
+-c <commit>
+    Like -C, but with -c the editor is invoked, so that the user can further edit the commit message.
+
+## archive snapshot
+
+    git archive -o latest.zip HEAD 
+
+## SPLITTING COMMITS
+
+In interactive mode, you can mark commits with the action "edit". However, this does not necessarily mean that git rebase expects the result of this edit to be exactly one commit. Indeed, you can undo the commit, or you can add other commits. This can be used to split a commit into two:
+
+    git rebase -i <commit>^ (where <commit> is the commit to split)
+    "e" to mark commit
+    git reset HEAD^
+    git add -i    # fix the commit
+    git rebase --continue
+
+If you are not absolutely sure that the intermediate revisions are consistent (they compile, pass the testsuite, etc.) you should use git stash to stash away the not-yet-committed changes after each commit, test, and amend the commit if fixes are necessary.
+
+## find out what files currently are ignored by git
+
+    git clean -dXn
+
+## rebase --onto
+
+ o---o---o---o---o  master
+         \
+          o---o---o---o---o  bugfixbranch
+                           \
+                            o---o---o  fix_nvram_manager
+
+              git rebase --onto          master                      bugfixbranch            fix_nvram_manager 
+                                          ^^^^                        ^^^^^^^^^^              ^^^^^^^^^^^^^^
+We want to: stick these commits onto the master (all changes between bugfixbranch and branch fix_nvram_manager) 
+
+    o---o---o---o---o  master
+        |            \
+        |             o'--o'--o'  fix_nvram_manager
+         \
+          o---o---o---o---o  bugfixbranch
+
+    git br fix_nvram_manager_backup fix_nvram_manager
+    git rebase --onto  master bugfixbranch fix_nvram_manager_backup
+    git co master
+    git rebase fix_nvram_manager_backup
+
+## clean stale tracking branches
+
+don't forget to accept new key when svn key changes! 
+
+    Error validating server certificate for 'https://esvls-svn01.corp.lear.com:8443':
+    (R)eject, accept (t)emporarily or accept (p)ermanently? p
+
+to do this:
+connect to server: ssh linuxmuc
+goto FEM repo: cd ~/dev/git/FEM
+setup environment (since it is a bare repo): export GIT_DIR=/home/linux2/dev/git/FEM
+fetch: git svn fetch
+
+
+## clean stale tracking branches
+
+    git remote prune public  
+
+prune       Deletes all stale tracking branches under <name>. These stale branches have already been removed from the remote repository referenced by <name>, but are still locally available in "remotes/<name>". With --dry-run option, report what branches will be pruned, but do no actually prune them.
+
+## git remove remote
+
+    git remote rm public    
+
+rm       Remove the remote named <name>. All remote tracking branches and configuration settings for the remote are removed.
+
+## using git log or git diff with:
+
+Show only names and status of changed files.
+
+    --name-status 
+
+    git difftool somebranch:UNREADME otherbranch:README   *diff files in 2 branches*
+`git show branch1:UNREADME`  (show file in branch)
+
+---------------------------------------
+
+## delete the remote-tracking branches
+
+    git br -d -r remoteBranchName
+
+## cleanup
+
+You might be needing a cleanup (see http://stackoverflow.com/questions/1072171/how-do-you-remove-an-invalid-remote-branch-reference-from-git) 
+
+    git gc --prune=now
+    git remote prune public
+       *prune*
+           Deletes all stale tracking branches under <name>. These stale branches have already been removed from
+           the remote repository referenced by <name>, but are still locally available in "remotes/<name>".
+
+ With `--dry-run` option, report what branches will be pruned, but do no actually prune them.
+
+---------------------------------------
+
+# git svn
+
+## add svn support for cloned repository
+
+### Cloning the repositories
+
+First, clone FEM and/or the the Toolkit to your computer via git clone. In this example, we'll clone from the FEM repository. Note that we're using the public clone URLs.
+
+    git clone http://my/svn/repo/FEM.git 
+
+This should leave you with a new subdirectory: FEM.
+
+### Downloading git references needed by git-svn
+
+git-svn needs to know how git commits relate to SVN commits. It stores this information under the references refs/remotes. Since remote references are not cloned by git clone, we'll have to fetch these references ourselves:
+
+    cd FEM
+    git fetch http://my/svn/repo/FEM.git +refs/remotes/*:refs/remotes/*
+    cd ..
+
+Use http://my/svn/repo/ in the above commands for the repository, since it is sure to contain up to date remote reference information.
+
+### Updating .git/config information used by git-svn
+
+Finally, you need to do a bit of editing of the git configuration files to tell git-svn the location of the SVN server it needs to use.
+
+First, open FEM/.git/config in your favourite text editor, and add the lines:
+
+    [svn-remote "svn"]
+            url = http://original/svn/repo/url
+            fetch = src/trunk/FEM:refs/remotes/trunk
+
+### Final steps
+
+Now you simply need run git svn rebase in your repository directories to download the latest changes from SVN.
+
+Since your repositories lack git-svn metadata, you might see messages such as:
+
+    Migrating from a git-svn v1 layout...                      
+    Data from a previous version of git-svn exists, but        
+            .git/svn                                           
+            (required for this version (1.5.4.3) of git-svn) does not. exist
+    Done migrating from a git-svn v1 layout                                 
+    Rebuilding .git/svn/trunk/.rev_map.54714841-351b-0410-a198-e36a94b762f5 ...
+    r3283 = b4d71b95c5c859b88a178720d811189919c744c0                           
+    r3699 = 5d61cbe82d09f345ebccb7fd3181b51ef18aee1e                           
+    r3707 = fccf428ef0dcbbec6b1bde6cc0d34d5e9669b9c8                           
+    r3733 = 5c7a66f8920756ce5a5301aac4dbfef44264fc58                           
+    r3734 = c814e923466793c47ceeff4b0158acdd0a3ddf4b                           
+    ...
+
+Don't worry about these messages. You should only see them once for each of your repositories.
+
+From this point onwards, you will be able to use git-svn to work directly with the main SVN repository. If you have commit access to the SVN repository, you will also be able to commit changes by issuing git svn dcommit.
+
+## clone only revisions since a particular revision
+
+  git svn clone -s -r1234:HEAD http://my/svn/repo svnclone.git
+
+## track different svn branch
+
+    git checkout -b svn_master_000.005.000 remotes/FEM_000.005.000_Release
+
+### inspect output of git log you can see that git-svn reveals the branch name and upstream SVN commit ID 
+
+    git log -1
+    
+...git-svn-id: https:// ... /branches/FEM_000.005.000_Release@8507
+this is like head a clean copy of the branch...better don't mess with it; same procedure as with master
+
+    git co -b svn_bugfix_FEM_1181_000.005.000
+    
+*...edit/test/commit...*
+
+    git co svn_master_000.005.000
+    git svn rebase
+
+*... go to bugfix branch, rebase svn_master_000.005.000, go back, merge bugfix branch*
+
+    git svn dcommit
+
+## git svn workflow
+
+    git checkout master 	                # get yourself to master  
+    git svn rebase 	                    	# make sure master is up to date
+    git checkout -b my_new_feature_branch
+*...test, code, fix, test, code, fix...*
+
+    git commit -a -m "my new feature stuff" # maybe preceded by some individual git add x, git rm x
+    git checkout master 	                  #I think you got it now, we are switching back to the master branch
+    git svn rebase 		                      # get any newly committed changes to the shared master trunk
+    git checkout my_new_feature_stuff # switch back to the feature branch 
+    git rebase master 	# attempt to apply our changes on to the latest trunk of codefix conflicts if any
+    git checkout master
+    git merge my_new_feature_branch # bring our new feature into the master (maybe --squash if there were a number of individual commits to get this branch done and we want them to show as a single commit)
+    git svn rebase 		# make sure things are good
+    git svn dcommit 	# push our modified master up to subversion trunk. This is the basic day in day out workfow. Some of the assumptions being that "git master" and "svn/trunk" are analogous to one another. If you are working on code that is from an origin other then trunk (like subversion branch/Version_x_y_z) you will be working in a local git branch that you create by: git branch local-branch_x_y_z VERSION_x_y_z
+
+## workflow for svn with one repository that is connected to svn (SVNSYNCER), one that is used for work (WORK)
+
+    cd SVNSYNCER
+    git svn fetch
+    cd WORK
+    git fetch svnsync # svnsync points to url = SVNSYNCER
+    git rebase svnsync/trunk
+
+...work...commit...
+
+## update SVNSYNCER
+
+    git fetch svnsync
+    git rebase svnsync/trunk
+    git push svnsync HEAD:refs/remotes/futureCommits/FEM-1412
+    cd SVNSYNCER
+    git svn rebase # make sure we got the lates stuff
+    git co -b tmpBranch remotes/work2beCommitted/topic #create a tmp branch for integrating our stuff. it will point to the work we want to commit
+    git rebase trunk_tracker # rebase our work ontop the current head (e.g. the trunk)
+    git co trunk_tracker # switch to trunk
+    git merge tmpBranch # merge in our rebased topic branch (fast forward)
+    git svn dcommit
+    git br -D tmpBranch # get rid of tmp branch
+
+---------------------------------------
+
+## git cvs workflow
+
+assumes 2 git repos: one to the cvs interactions (GIT\_CVS), one for doing the local work (GIT\_WORK)
+
+**initial import**
+
+    CVS_RSH=ssh; export CVS_RSH
+    CVSROOT=:ext:oliver.mueller.lear@cvs.teststatt.de:/data/var/lib/cvs; export CVSROOT
+    git cvsimport -a -p x -v -d $CVSROOT zgw
+
+### cvs over ssh:
+
+im .ssh/config:
+Host teststatt
+  HostKeyAlias cvs.teststatt.de
+  Hostname cvs.teststatt.de
+  Port 443
+  User oliver.mueller.lear
+  IdentityFile ~/.ssh/oliver.mueller.lear
+
+$ cvs -d :ext:teststatt:/data/var/lib/cvs co zgw
+
+### git <- cvs
+
+## get latest cvs changes (assumes CVSROOT)
+
+    git cvsimport -p x -v -d $CVSROOT zgw
+    cd WORKING_SANDBOX/MODULE_NAME
+    git fetch
+    git rebase origin/HEAD
+
+---------------------------------------
+
+# log and patches
+
+### install better git log to "git lg"
+git config --global alias.lg "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+
+### alles seit gestern in enspr. formattierung
+    git log --format="%n%Cbluecommit %h %Creset:%Cred %an%Creset, %ar%n%Cgreen\"%s\"%Creset%nchanged files with this commit:" --since="yesterday" --name-only
+### alles in der letzten stunde
+    git log --format="%n%Cbluecommit %h %Creset:%Cred %an%Creset, %ar%n%Cgreen\"%s\"%Creset" --since="one hour"
+### log everything for an author (case insensitive)
+    git log --author=omueller -i
+### view the change history of a file
+    git log -p filename
+### generate the patches for each log entry, see
+    git help log
+### for more options - it can actually do a lot of nice things :) To get just the diff for a specifiy commit you can
+    git show HEAD
+or any other revision by identifier. Or use gitk to browse the changes visually.
+
+### Generating patches for eclipse
+    git diff --no-prefix origin/cvs/HEAD > my\_bugNNN.patch
+
+### produce a diff between 2 folders in HEAD and branchB and apply that diff to branchA (branchB has changes that we want)
+    git diff HEAD:ecuStateManager/ branchB:ecuStateManager/ >> ecuManager.patch
+    git apply --directory=ecuStateManager ecuManager.patch
+
+## diffs using tool
+"git difftool" accepts the same options as "git diff".
+
+## diff of 2 files in different branches
+    git difftool somebranch:UNREADME otherbranch:README
+
+## partly cherry-picking a commit with git
+    git cherry-pick -n <commit>   # get your patch, but don't commit (-n = --no-commit)
+    git add -p                    # make all your choices
+    git commit                    # make the commit!
+
+---------------------------------------
+
+### git: revert (reset) a single file
+
+### undo uncommitted change 
+    git checkout -- filename (This will checkout the file from HEAD, overwriting your change.)
+
+### Automatically "git rm" all deleted files
+    git add -u
+
+### revert changes in one file
+    git diff ..HEAD~1 gitosis.conf | git apply
+
+### rewrite history
+
+    git filter-branch --tree-filter 'if [ -d vimuniversal/vimfiles ]; then mv vimuniversal/vimfiles/* .; fi' --prune-empty HEAD
+
+    git filter-branch -f --commit-filter '
+            if [ "$GIT_AUTHOR_NAME" = "(no author)" ];
+            then
+                    GIT_AUTHOR_NAME="omueller";
+                    GIT_AUTHOR_EMAIL="omueller@lear.com";
+                    git commit-tree "$@";
+            else
+                    git commit-tree "$@";
+            fi' HEAD 
+
+    git filter-branch -f --msg-filter '
+            cat &&
+            echo "Acked-by: Bugs Bunny <bunny@bugzilla.org> $1 $2"
+    ' 3f1ae37~1..5f1a8227c
+
+### remove remote
+    git remote rm oldrepo
+
+---------------------------------------
+
+## connect to git over samba share from windows
+The shared (bare) repo is on a network drive, and that drive is mapped:
+(remember to do that using windows shell...NOT git shell etc.)
+
+    using windows cmd shell:     c:> net use g: \\server1\Engineering 
+
+Then individual developers can clone do something like this from bash:
+
+    git clone file://g:/path/to/repo/on/G myclone.git
+
+to remove the mapped drive:
+
+    c:> net use g: /delete
+
+---------------------------------------
+
+### in order to ignore uncommitted changes in already tracked files
+    git update-index --assume-unchanged file.txt
+
+### list all untracked folders
+    git ls-files --others --exclude-standard --directory --no-empty-directory
+
+### copy untracked files into a separate directory outside the git repository before cleaning up, use
+    git ls-files --others --exclude-standard -z | cpio -pmd0 ../untracked-backup/
+
+Options used:
+
+  * --others lists untracked files
+  * --exclude-standard uses .gitignore and the default git excludes
+  * -z null-delimited output
+  * -p pass-through (=copy)
+  * -m preserve modification times
+  * -d create missing directories
+  * -0 null-delimited input
+
+### removing selected commits from repository
+Let's pretend you want to rework your last 10 patches, you'll run:
+
+    git rebase -i HEAD~10
+
+---------------------------------------
+
+# administering using gitosis
+[scie.nti.st][1]
+
+* clone repository
+
+    `git clone git@10.40.38.79:gitosis-admin.git`
+
+* add new repository
+* add entry to gitosis.conf (e.g. writable = buildplugin)
+* commit changes to gitosis.git sever repository
+
+    // create local git repository first
+    git remote add origin git@10.40.38.79:free_monkey.git
+    git config remote.origin.push master:refs/heads/master // add remote push ref
+    git push origin // (master:refs/heads/master)
+
+## add user
+* add public ssh key to keydir
+* add user in gitosis.conf (add to a group that has access for repository)
+* important: user name in gitosis.conf == name of public key without ".pub"
+* commit changes to gitosis.git sever repository
+
+### on user side
+
+* generate new ssh-key-pair:
+    $ ssh-keygen -t rsa -C "your_email@youremail.com"
+
+* add config to .ssh folder
+* add entry like this:
+    Host linuxmuc_git
+      User 	git
+      HostKeyAlias 10.40.38.79
+      Hostname 10.40.38.79
+      IdentityFile ~/.ssh/omueller.linux2
+* test ssh connection:
+    $ ssh -v linuxmuc_git
+
+## Rename project in gitosis.conf
+
+Before:
+
+    [group main]
+    writable = tk
+
+After:
+
+    [group main]
+    writable = show-time
+
+Push changes
+
+    git push origin master
+
+Connect to gitosis server and rename correct folder
+
+    cd /home/git/repositories
+    mv tk show-time
+
+Change the remote reference in all repository clones
+
+    cd /src/show-time
+    git remote rm origin
+    git remote add origin git@example-git-server.com:show-time.git
+
+Done and done.
+
+[1]: http://scie.nti.st/2007/11/14/hosting-git-repositories-the-easy-and-secure-way
+
+---------------------------------------

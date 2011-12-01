@@ -1,0 +1,18 @@
+# https / SSL
+
+## configure ssl support (enalbe ssl)
+
+    a2enmod ssl
+    /etc/init.d/apache2 restart
+
+## enable port 443
+
+### edit ports.conf
+
+    Listen 80
+    Listen 443
+
+## git client side
+
+    export GIT_SSL_NO_VERIFY=true
+
