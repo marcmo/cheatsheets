@@ -23,5 +23,9 @@
 
     $ ssh-keygen -y -f private.key
 
+### generate fingerprint for ssh key
+
+    $ ssh-keygen -lf ~/.ssh/id_rsa.pub
+
 
 

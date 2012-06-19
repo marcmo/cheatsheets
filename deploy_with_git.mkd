@@ -1,0 +1,74 @@
+# deployment using git
+
+*How does it work?*
+
+we have 3 repositories:
+ 
+* repoA: local development repository that contains only the sources to be published
+* repoB: remote repository that will receive with a push request
+* repoC: remote repository in webserver folder that will pull from the repoB
+
+## local (client)
+
+### create git repo that contains sources to deploy (repoA)
+
+    git remote add coldflake oliver@173.230.139.188:dev/git/esrlabs.git
+    git config remote.coldflake.push master:refs/heads/master
+
+the git config will look s.th. like:
+
+    ...
+    [remote "coldflake"]
+      url = oliver@173.230.139.188:dev/git/esrlabs.git
+      fetch = +refs/heads/*:refs/remotes/coldflake/*
+      push = master:refs/heads/master
+
+
+## remote (server)
+
+### create git to push to (repoB)
+
+* bare repository
+
+    git init --bare esrlabs.git
+
+* post receive hook:
+
+    #!/bin/sh
+    echo "executing post-receive hook in: `pwd`"
+    unset GIT_DIR
+    cd /srv/www/esrlabs.com
+    git pull origin master
+    
+
+### create git repository in webserver folder (repoC)
+
+    $ sudo mkdir esrlabs.com
+    $ cd esrlabs.com/
+    $ sudo  chown -R oliver:admin .
+    $ git init .
+    $ git remote add origin /home/oliver/dev/git/esrlabs.git
+    $ git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+
+will result in .git/config:
+
+    [remote "origin"]
+      url = /home/oliver/dev/git/esrlabs.git
+      fetch = +refs/heads/*:refs/remotes/origin/*
+
+make sure the logs folder is available that is configured for nginx
+
+## deploying
+
+### on client side
+
+    git push coldflake
+
+# nginx configuration update
+
+* update nginx files (e.g. in /usr/local/nginx/conf)
+* add to sites-available (e.g. in /etc/local/nginx/sites-available)
+* link in sites-enabled 
+* create folder for logging output (e.g. coldground.com/logs)
+
+

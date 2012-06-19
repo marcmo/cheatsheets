@@ -1,3 +1,30 @@
+# df - to check free disk space
+
+Type df -h or df -k to list free disk space:
+
+    $ df -h
+
+OR
+
+    $ df -k
+
+# Pass command line argument to bash alias command
+
+    function foo() { /path/to/command "$@" ;}
+
+Now you can call foo():
+foo arg1 arg2 argN
+(see http://www.cyberciti.biz/faq/linux-unix-pass-argument-to-alias-command/)
+
+# diff
+
+## find out difference between folders
+
+    diff -rq folder1 folder2
+
+-r  look at each directory recursively
+-q  sets diff brief mode
+
 # cut and paste
 
 ## count loc in a codebase
@@ -9,7 +36,6 @@
 * feed the resulting string to bc
 
     find -E . -regex ".*\.(cpp|c|h|hpp)" | xargs -n1 wc -l | cut -f1 -d'.' | paste -sd+ - | bc
-    
 
 # zip
 
@@ -200,7 +226,7 @@ watch runs command repeatedly, displaying its output (the first screenfull). Thi
     
 ## find manpages for a specific topic
 
-		$ man -k xxx  -- will list all manpages that contain information about xxx
+    $ man -k xxx  -- will list all manpages that contain information about xxx
 
 # seq command
 
@@ -212,6 +238,10 @@ watch runs command repeatedly, displaying its output (the first screenfull). Thi
 # find
 
     find . -name *exe | ack.pl -i unittest
+
+### find all files that are executable
+
+    find <dir> -executable -type f
 
 ### find all files with multiple patterns
 

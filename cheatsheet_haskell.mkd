@@ -1,0 +1,6 @@
+## cabal
+
+### install package with special ghc options
+
+    cabal install --ghc-option=-XDatatypeContexts
+

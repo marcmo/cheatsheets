@@ -2,6 +2,41 @@
 
 ## Recently added
 
+### repeat command-line
+
+    @:      -- repeat last : command (then @@)
+
+### When replacing:
+
+    & is the text that matches the search pattern
+    \& is ampersand
+    \r is newline
+    \n is a null byte (0x00).
+    \1 inserts the text of the 1. backreference a.s.o.
+
+### delete all whitespaces up to next word
+
+    dw
+
+### paste in visual mode
+    
+block has to be selected visually
+  
+    I               -- put cursor at the start of the first row of the block
+    A               -- put cursor at the end of the first row of the block
+    Ctrl-R + [Reg]  -- puts the content of [Register] at cursor position
+    Esc             -- propagates the paste to all lines of visual selection
+    
+### Copy content of registers
+
+    :let @+=@"  -- will copy the content of the '"'-register to the global '+'-register
+
+### Using normal-mode motions in command-line mode
+
+    Ctrl-F  -- open command-line window when in Vim command-line
+    <Enter> -- will run the command
+    Ctrl-C  -- return to standard command-line
+
 ###  append to a named register use it's corresponding upper case character
 
     "ayy  -- yank line to register a
@@ -12,6 +47,10 @@
 
     :s/\%Vred/blue/g
 
+### replace using magic regular expression extension
+
+    :%s/\v"(\S*)"/*|\1|*/g      --  replace all strings in quotes
+
 ### GOTO Column
 
     80| -- go to the 80th column   
@@ -20,7 +59,7 @@
 
     set virtualedit=all
 
-### Save a file you edited in vim without the needed permissions
+### Save a file you edited in vim without the needed permissions (e.g. readonly file) (force write)
 
     :w !sudo tee %
 
@@ -240,6 +279,11 @@ add config file for jslint: ~/.jslint
     <C-R> -         -- pull small register
     <C-R> [0-9a-z]  -- pull named registers
     <C-R> %         -- pull file name (also #)
+
+## entering/leaving ex-mode:
+    
+    Q       -- enter 'ex'
+    visual  -- leave 'ex'
 
 ## ex commands:
 

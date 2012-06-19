@@ -1,3 +1,47 @@
+## Add remote repository
+
+    satellite>  git remote add origin git@my_git_server:test.git
+    satellite>  git remote -v
+    satellite>  origin	git@my_git_server:test.git (fetch)
+    satellite>  origin	git@my_git_server:test.git (push)
+
+### configure push branch
+
+    satellite>  git config remote.origin.push master:refs/remotes/satellite/master 
+
+## git configuration
+
+### Global ignore file
+
+    git config --global core.excludesfile ~/.gitignore
+
+### Shortcuts
+
+    git config --global alias.st status
+    git config --global alias.ci commit
+    git config --global alias.co checkout
+    git config --global alias.br branch
+
+### Global committer info
+
+    git config --global user.name "oliver mueller"
+    git config --global user.email oliver.mueller@gmail.com
+
+### Colorized output
+
+    git config --global color.branch auto
+    git config --global color.diff auto
+    git config --global color.interactive auto
+    git config --global color.status auto
+
+### Vim as the default editor
+
+    git config --global core.editor "vim"
+
+## find out what files currently are ignored by git
+
+    git clean -dXn
+
 ## compare files/folders from different branches
 
     $ git diff branchA:folderA branchB:folderB
@@ -118,10 +162,6 @@ In interactive mode, you can mark commits with the action "edit". However, this 
     git rebase --continue
 
 If you are not absolutely sure that the intermediate revisions are consistent (they compile, pass the testsuite, etc.) you should use git stash to stash away the not-yet-committed changes after each commit, test, and amend the commit if fixes are necessary.
-
-## find out what files currently are ignored by git
-
-    git clean -dXn
 
 ## rebase --onto
 
@@ -503,13 +543,13 @@ Let's pretend you want to rework your last 10 patches, you'll run:
 
 * add config to .ssh folder
 * add entry like this:
-    Host linuxmuc_git
+    Host my_git_server
       User 	git
       HostKeyAlias 10.40.38.79
       Hostname 10.40.38.79
       IdentityFile ~/.ssh/omueller.linux2
 * test ssh connection:
-    $ ssh -v linuxmuc_git
+    $ ssh -v my_git_server
 
 ## Rename project in gitosis.conf
 

@@ -1,3 +1,9 @@
+## add do loadpath
+$:.unshift File.join(File.dirname(__FILE__),"..","..","lib")
+
+## List all subdirectories
+
+    Dir.glob("*/")
 
 # ruby gems
 
@@ -9,3 +15,22 @@ sudo gem install rake -i /usr/local/lib/ruby
 
 sudo gem uninstall rake -i /usr/local/lib/ruby
 
+# yaml files
+
+## sample yaml file: test.yml
+
+compiler: gcc
+
+## load yaml file
+
+    require 'yaml'
+    yml = YAML::load(File.open('compiler_config.yml'))
+    puts yml['compiler']
+
+# procs / lambdas
+
+      p = Proc.new { return "return from foo from inside proc" }
+      l = lambda { return "return from lambda" }
+
+      p.call # prints "return from foo from inside proc" 
+      l.call # prints "return from bar" 
