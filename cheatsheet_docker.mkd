@@ -1,0 +1,169 @@
+# docker
+
+## start 2nd process in container
+
+start first process
+
+    docker run --rm -it <containerIdOrName>
+
+start 2nd process (bash)
+
+    sudo docker exec -it <containerIdOrName> bash
+
+## commit changes to running container
+
+find out the container id by using `docker ps -a`
+
+    docker commit
+
+## start container with defined mac address
+
+Newer versions of docker take a --mac-address=12:34:56:78:9a:bc switch to docker run.
+
+    sudo docker run --rm --mac-address"=12:34:de:b0:6b:61" ubuntu ifconfig | grep HWaddr
+    eth0      Link encap:Ethernet  HWaddr 12:34:de:b0:6b:61
+
+## cleanup
+
+### remove exited containers
+
+    docker ps -a | ag Exited | awk '{print $1}' | xargs docker rm
+
+### remove <none> tagged images
+
+    docker images | ag "<none>" | awk '{ print $3 }' | xargs docker rmi
+
+## Running Wine within a Docker container
+
+gives usually the error that there’s no X server running inside the container
+
+    Make sure that your X server is running and that $DISPLAY is set correctly.
+
+expose the host’s X server UNIX domain socket inside the container. We can ask Docker to bind mount
+the /tmp/.X11-unix/X0 UNIX socket to the same location inside the container using the --volume
+parameter
+
+    docker run --rm --volume /tmp/.X11-unix/X0:/tmp/.X11-unix/X0 wine1.4 wine "C:\windows\system32\notepad.exe"
+
+run with mounted drive
+
+    docker run --rm -it -e DISPLAY \
+      -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+      -v /home/ethanhunt/dev/git/csm/ws:/home/dev/ws \
+      --mac-address="d4:be:d9:a3:b5:4c" diab:0.2
+
+### set timezone in docker container
+
+use TZ
+
+    docker run -t -i --rm -e TZ=Europe/Berlin ubuntu date
+
+### change your working directory on `docker run`
+
+    docker run
+      -w, --workdir=""           Working directory inside the container
+
+## Problem Shooting
+
+After I run the docker container of osrf/ros, I got the following error, and the GUI not work!
+
+  $ docker run -it --security-opt="label:disable" --env="DISPLAY"
+  --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" osrf/ros:indigo-desktop-full rqt
+
+  X Error: BadAccess (attempt to access private resource denied) 10
+  Extension: 130 (MIT-SHM)
+
+The MIT-SHM is an extension to the X server which allows faster transactions by using shared memory.
+Docker isolation probably blocks it. Qt applications can be forced not to use the extension. Try
+using:
+
+    --env QT_X11_NO_MITSHM=1
+
+It could be a good idea to add it to the images
+
+### xserver permission problems
+
+Above, we made the container's processes interactive, forwarded our DISPLAY environment variable, mounted a volume for the X11 unix socket, and recorded the container's ID. This will fail at first and look something like this, but that's ok:
+
+    No protocol specified
+    rqt: cannot connect to X server unix:0
+
+We can then expose the unix socket. This is not the safest way however, as you then disabled the access control to X server on your host. So with little effort, anyone could display something on your screen, capture user input, in addition to making it easier to exploit other vulnerabilities that might exist in X.
+
+    xhost + # for the lazy and reckless
+
+If you are concerned about this (as you should be), you have at least two options. The first is to run
+
+    xhost -
+
+after you are finished using the containerized GUI, this will return the access controls that were disabled with the previous command.
+
+## To run multiple commands in docker
+
+use `/bin/bash -c` and semicolon `;`
+
+    docker run image /bin/bash -c "cd /path/to/somewhere; python a.py"
+
+## move image between nodes
+
+on old location:
+
+    $ docker save mynewimage > /tmp/mynewimage.tar
+
+on new location:
+
+    $ docker load < /tmp/mynewimage.tar
+
+# docker-machine
+
+## ssh into virtualbox
+
+    docker-machine ssh default
+
+## using parallels
+
+To create a Parallels Desktop virtual machine for Docker purposes just run this command:
+
+    $ docker-machine create --driver=parallels prl-dev
+
+Available options:
+
+    --parallels-boot2docker-url: The URL of the boot2docker image.
+    --parallels-disk-size: Size of disk for the host VM (in MB).
+    --parallels-memory: Size of memory for the host VM (in MB).
+    --parallels-cpu-count: Number of CPUs to use to create the VM (-1 to use the number of CPUs available).
+    --parallels-no-share: Disable the sharing of /Users directory
+
+## problems exposing xhost (see http://wiki.ros.org/docker/Tutorials/GUI)
+
+The simple way is expose your xhost so that container can render to the correct display by reading and writing though the X11 unix socket.
+
+    docker run -it \
+        --env="DISPLAY" \
+        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+        osrf/ros:indigo-desktop-full \
+        rqt
+    export containerId='docker ps -l -q'
+
+Above, we made the container's processes interactive, forwarded our DISPLAY environment variable, mounted a volume for the X11 unix socket, and recorded the container's ID. This will fail at first and look something like this, but that's ok:
+
+    No protocol specified
+    rqt: cannot connect to X server unix:0
+
+We can then expose the unix socket. This is not the safest way however, as you then disabled the access control to X server on your host. So with little effort, anyone could display something on your screen, capture user input, in addition to making it easier to exploit other vulnerabilities that might exist in X.
+
+    xhost + # for the lazy and reckless
+
+If you are concerned about this (as you should be), you have at least two options. The first is to run
+
+    xhost -
+
+after you are finished using the containerized GUI, this will return the access controls that were disabled with the previous command.
+
+A better option is opening up xhost only to the specific system that you want, for instance if you are running a container on the local host's docker daemon with container's ID stored to the shell variable containerId
+
+    xhost +local:`docker inspect --format='{{ .Config.Hostname }}' $containerId`
+    docker start $containerId
+
+This will add the container's hostname to the local family's list of permitted names.
+

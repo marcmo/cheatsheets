@@ -1,0 +1,6 @@
+## split string using a delimiter
+
+e.g. Using "," as a delimiter
+
+    $ echo "abc:def" | awk -F':' '{print "field1: "$1 "\nfield2: "$2}'
+

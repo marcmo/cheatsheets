@@ -1,0 +1,30 @@
+[user]
+        name = omueller
+        email = omueller@lear.com
+[color]
+	branch = auto
+	diff = auto
+	interactive = auto
+	status = auto
+	pager = true
+	ui = auto
+[merge]
+	keepBackup = false
+	tool = kdiff3
+[mergetool "kdiff3"]
+	cmd = kdiff3 -m "$LOCAL" "$REMOTE" "$BASE" -o "$MERGED"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+#[diff]
+#	external = kdiff3
+[alias]
+	st = status
+	di = diff
+	co = checkout
+	ci = commit
+	br = branch
+	sta = stash
+[core]
+	whitespace = trailing-space,space-before-tab,cr-at-eol
+	pager = less

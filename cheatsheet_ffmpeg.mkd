@@ -1,0 +1,11 @@
+# Conversion
+
+## FLV to MP4
+
+### Preserving the Quality
+
+    ffmpeg -i input.flv -sameq -ar 22050 output.mp4
+
+## MP4 to MP3
+
+    for i in *.mp4; do ffmpeg -i "$i" "${i/.mp4}.mp3"; done

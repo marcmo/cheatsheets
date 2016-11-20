@@ -1,0 +1,330 @@
+Cheatsheet for RUST
+===================
+
+## logging
+
+### no stdout in cargo test
+
+    cargo test -- --nocapture
+
+
+## Sleep
+
+    use std::time::Duration;
+    use std::thread;
+
+    fn main() {
+        thread::sleep(Duration::from_millis(4000))
+    }
+
+# Strings
+
+## convert String to &str
+
+    let s_slice: &str = &s[..];  // take a full slice of the string
+
+## convert `Vec<char>` to String
+
+    let v = vec!['a', 'b', 'c', 'd'];
+    let s: String = v.into_iter().collect();
+
+## Check if self contains another &str
+
+    assert!("bananas".contains("nana"));
+    assert!(!"bananas".contains("foobar"));
+
+## Check if the given &str is a prefix of the string
+
+    assert!("banana".starts_with("ba"));
+
+## Check if the given &str is a sufix of the string
+
+    assert!("banana".ends_with("nana"));
+
+## replace occurences
+
+    let s = "this is old";
+    assert_eq!(s.replace("old", "new"), "this is new");
+
+## Splitting
+
+### split string into lines
+
+    let four_lines = "foo\nbar\n\nbaz";
+    let v: Vec<&str> = four_lines.lines().collect();
+    assert_eq!(v, ["foo", "bar", "", "baz"]);
+
+## Joining
+
+### join list of strings
+
+    assert_eq!(["hello", "world"].join(" "), "hello world");
+
+## Concatenation
+
+### concatenate a &str to the end of a String
+
+    let hello = "Hello ".to_string();
+    let world = "world!";
+
+    let hello_world = hello + world;
+
+### concatenate a String to the end of a String
+
+if you have two Strings, you need an &:
+
+    let hello = "Hello ".to_string();
+    let world = "world!".to_string();
+
+    let hello_world = hello + &world;
+
+This is because &String can automatically coerce to a &str. This is a feature called ‘Deref coercions’.
+
+## concatenate Strings
+
+    let mut s = String::from("foo");
+    s.push_str("bar");
+    assert_eq!(s, "foobar");
+
+
+# global constants
+
+    // Globals are declared outside all other scopes.
+    static LANGUAGE: &'static str = "Rust";
+    const  THRESHOLD: i32 = 10;
+
+# Option & Result type
+
+
+## Convert from Result<T, E> to Option<T>
+
+    let x: Result<u32, &str> = Ok(2);
+    assert_eq!(x.ok(), Some(2));
+
+    let x: Result<u32, &str> = Err("Nothing here");
+    assert_eq!(x.ok(), None);
+
+# Tuple
+
+## Values can be extracted from the tuple using tuple indexing
+
+    let long_tuple = (1u8, 2u16, 3u32, 4u64,
+                      -1i8, -2i16, -3i32, -4i64,
+                      0.1f32, 0.2f64,
+                      'a', true);
+    println!("long tuple first value: {}", long_tuple.0);
+    println!("long tuple second value: {}", long_tuple.1);
+
+## tuples can be destructured to create bindings
+
+    let tuple = (1, "hello", 4.5, true);
+    let (a, b, c, d) = tuple;
+
+# File IO
+
+## Open a file in read-only mode.
+
+This function will return an error if path does not already exist. Other errors may also be returned according to OpenOptions::open.
+
+    use std::fs::File;
+    let mut f = try!(File::open("foo.txt"));
+
+## Open a file in write-only mode.
+
+This function will create a file if it does not exist, and will truncate it if it does.
+
+    use std::fs::File;
+    let mut f = try!(File::create("foo.txt"));
+
+# Path Stuff
+
+## find out current directory pwd
+
+    use std::env;
+    let p = env::current_dir().unwrap();
+    println!("The current directory is {}", p.display());
+
+# Initialization
+
+## Initialize string from file
+
+Includes a utf8-encoded file as a string.
+This macro will yield an expression of type &'static str which is the contents of the filename specified. The file is located relative to the current file (similarly to how modules are found),
+
+    let secret_key = include_str!("secret-key.ascii");
+
+---
+
+Syntax Index
+============
+
+## Keywords
+
+* `as`: primitive casting.
+* `break`: break out of loop.
+* `const`: constant items.
+* `continue`: continue to next loop iteration.
+* `crate`: external crate linkage.
+* `else`: fallback for `if` and `if let` constructs.
+* `enum`: defining enumeration.
+* `extern`: external crate, function, and variable linkage.
+* `false`: boolean false literal.
+* `fn`: function definition and function pointer types.
+* `for`: iterator loop, part of trait `impl` syntax, and higher-ranked lifetime syntax.
+* `if`: conditional branching.
+* `impl`: inherent and trait implementation blocks.
+* `in`: part of `for` loop syntax.
+* `let`: variable binding.
+* `loop`: unconditional, infinite loop.
+* `match`: pattern matching.
+* `mod`: module declaration.
+* `move`: part of closure syntax.
+* `mut`: denotes mutability in pointer types, pattern bindings, and `struct` fields.
+* `pub`: denotes public visibility in `struct` fields, `impl` blocks, and modules.
+* `ref`: by-reference binding.
+* `return`: return from function.
+* `Self`: implementer type alias.
+* `self`: method subject.
+* `static`: global variable.
+* `struct`: structure definition.
+* `trait`: trait definition.
+* `true`: boolean true literal.
+* `type`: type alias, and associated type definition.
+* `unsafe`: denotes unsafe code, functions, traits, and implementations.
+* `use`: import symbols into scope.
+* `where`: type constraint clauses.
+* `while`: conditional loop.
+
+## Operators and Symbols
+
+* `!` (`expr!(…)`, `expr!{…}`, `expr![…]`): denotes macro expansion.
+* `!` (`!expr`): bitwise or logical complement.  Overloadable (`Not`).
+* `%` (`expr % expr`): arithmetic remainder.  Overloadable (`Rem`).
+* `%=` (`var %= expr`): arithmetic remainder & assignment.
+* `&` (`expr & expr`): bitwise and.  Overloadable (`BitAnd`).
+* `&` (`&expr`): borrow.
+* `&` (`&type`, `&mut type`, `&'a type`, `&'a mut type`): borrowed pointer type.
+* `&=` (`var &= expr`): bitwise and & assignment.
+* `&&` (`expr && expr`): logical and.
+* `*` (`expr * expr`): arithmetic multiplication.  Overloadable (`Mul`).
+* `*` (`*expr`): dereference.
+* `*` (`*const type`, `*mut type`): raw pointer.
+* `*=` (`var *= expr`): arithmetic multiplication & assignment.
+* `+` (`expr + expr`): arithmetic addition.  Overloadable (`Add`).
+* `+` (`trait + trait`, `'a + trait`): compound type constraint.
+* `+=` (`var += expr`): arithmetic addition & assignment.
+* `,`: argument and element separator.
+* `-` (`expr - expr`): arithmetic subtraction.  Overloadable (`Sub`).
+* `-` (`- expr`): arithmetic negation.  Overloadable (`Neg`).
+* `-=` (`var -= expr`): arithmetic subtraction & assignment.
+* `->` (`fn(…) -> type`, `|…| -> type`): function and closure return type.
+* `.` (`expr.ident`): member access.
+* `..` (`..`, `expr..`, `..expr`, `expr..expr`): right-exclusive range literal.
+* `..` (`..expr`): struct literal update syntax.
+* `..` (`..ident`): "and the rest" pattern binding.
+* `...` (`expr ... expr`): inclusive range pattern.
+* `/` (`expr / expr`): arithmetic division.  Overloadable (`Div`).
+* `/=` (`var /= expr`): arithmetic division & assignment.
+* `:` (`pat: type`, `ident: type`): constraints.
+* `:` (`ident: expr`): struct field initialiser.
+* `:` (`'a: loop {…}`): loop label.
+* `;`: statement and item terminator.
+* `;` (`[…; len]`): part of fixed-size array syntax.
+* `<<` (`expr << expr`): left-shift.  Overloadable (`Shl`).
+* `<<=` (`var <<= expr`): left-shift & assignment.
+* `<` (`expr < expr`): less-than comparison.  Overloadable (`Cmp`, `PartialCmp`).
+* `<=` (`var <= expr`): less-than or equal-to comparison.  Overloadable (`Cmp`, `PartialCmp`).
+* `=` (`var = expr`, `ident = type`): assignment/equivalence.
+* `==` (`var == expr`): comparison.  Overloadable (`Eq`, `PartialEq`).
+* `=>` (`pat => expr`): part of match arm syntax.
+* `>` (`expr > expr`): greater-than comparison.  Overloadable (`Cmp`, `PartialCmp`).
+* `>=` (`var >= expr`): greater-than or equal-to comparison.  Overloadable (`Cmp`, `PartialCmp`).
+* `>>` (`expr >> expr`): right-shift.  Overloadable (`Shr`).
+* `>>=` (`var >>= expr`): right-shift & assignment.
+* `@` (`expr @ expr`): pattern binding.
+* `^` (`expr ^ expr`): bitwise exclusive or.  Overloadable (`BitXor`).
+* `^=` (`var ^= expr`): bitwise exclusive or & assignment.
+* `|` (`expr | expr`): bitwise or.  Overloadable (`BitOr`).
+* `|` (`pat | pat`): pattern alternatives.
+* `|=` (`var |= expr`): bitwise or & assignment.
+* `||` (`expr || expr`): logical or.
+* `_`: "ignored" pattern binding.
+
+## Other Syntax
+
+<!-- Various bits of standalone stuff. -->
+
+* `'ident`: named lifetime or loop label.
+* `…u8`, `…i32`, `…f64`, `…usize`, …: numeric literal of specific type.
+* `"…"`: string literal.
+* `r"…"`, `r#"…"#`, `r##"…"##`, …: raw string literal.
+* `b"…"`: byte string literal.
+* `rb"…"`, `rb#"…"#`, `rb##"…"##`, …: raw byte string literal.
+* `'…'`: character literal.
+* `b'…'`: ASCII byte literal.
+
+<!-- Path-related syntax -->
+
+* `ident::ident`: path.
+* `::path`: path relative to the crate root (*i.e.* an explicitly absolute path).
+* `self::path`: path relative to the current module (*i.e.* an explicitly relative path).
+* `super::path`: path relative to the parent of the current module.
+* `type::ident`: associated constants, functions, and types.
+* `<type>::…`: associated item for a type which cannot be directly named (*e.g.* `<&T>::…`, `<[T]>::…`, *etc.*).
+
+<!-- Generics -->
+
+* `path<…>`: specifies parameters to generic type *in a type*.
+* `path::<…>`: specifies parameters to generic type or function *in an expression*.
+* `ident<…>`: generic parameters.
+* `for<…> type`: higher-ranked lifetime bounds.
+* `type<ident=type>` (*e.g.* `Iterator<Item=T>`): a generic type where one or more associated types have specific assignments.
+
+<!-- Constraints -->
+
+* `T: U`: generic parameter `T` constrained to types that implement `U`.
+* `T: 'a`: generic type `T` must outlive lifetime `'a`.
+* `'b: 'a`: generic lifetime `'b` must outlive lifetime `'a`.
+* `T: ?Sized`: allow generic type parameter to be a dynamically-sized type.
+* `'a + trait`, `trait + trait`: compound type constraint.
+
+<!-- Macros and attributes -->
+
+* `#[meta]`: outer attribute.
+* `#![meta]`: inner attribute.
+* `$ident`: macro substitution.
+* `$ident:kind`: macro capture.
+* `$(…)…`: macro repetition.
+
+<!-- Comments -->
+
+* `//`: line comment.
+* `//!`: inner line doc comment.
+* `///`: outer line doc comment.
+* `/*…*/`: block comment.
+* `/*!…*/`: inner block doc comment.
+* `/**…*/`: outer block doc comment.
+
+<!-- Various things involving parens and tuples -->
+
+* `()`: empty tuple (*a.k.a.* unit), both literal and type.
+* `(expr)`: parenthesised expression.
+* `(expr,)`: single-element tuple expression.
+* `(type,)`: single-element tuple type.
+* `(expr, …)`: tuple expression.
+* `(type, …)`: tuple type.
+* `expr(expr, …)`: function call expression.  Also used to initialise tuple `struct`s and tuple `enum` variants.
+* `ident!(…)`, `ident!{…}`, `ident![…]`: macro invocation.
+* `expr.0`, `expr.1`, …: tuple indexing.
+
+<!-- Bracey things -->
+
+* `{…}`: block expression.
+* `Type {…}`: `struct` literal.
+
+<!-- Brackety things -->
+
+* `[…]`: array literal.
+* `[expr; len]`: array literal containing `len` copies of `expr`.
+* `[type; len]`: array type containing `len` instances of `type`.
+

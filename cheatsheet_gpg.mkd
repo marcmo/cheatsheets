@@ -1,0 +1,67 @@
+most taken from http://www.madboa.com/geek/gpg-quickstart/
+
+# Your Key
+
+## Generate a private key.
+
+    gpg --gen-key
+
+## view all stored keys
+
+    gpg --list-keys
+
+## Generate an ASCII version of your public key.
+
+    gpg --output pubkey.txt --armor --export 'Your Name'
+    gpg --output mygpgkey_sec.gpg --armor --export-secret-key 'Your Name'
+
+## register your key with public keyservers
+
+    gpg --send-keys 'Your Name' --keyserver hkp://subkeys.pgp.net
+
+# Encrypting a file for someone else
+
+## Add your friend’s key
+
+    gpg --import key.asc
+
+## find your friend’s key on a public keyserver
+
+    gpg --search-keys 'myfriend@his.isp.com' --keyserver hkp://subkeys.pgp.net
+
+## encrypt a file using the other person’s public key
+
+    gpg -e -r <name> <file>
+
+## encrypt a file using multiple other person’s public keys
+
+    gpg -e -r <name1> -r <name2> ... <file>
+
+## Decrypting a file from someone else
+
+    gpg --output foo.txt --decrypt foo.txt.gpg
+
+# Detached Signatures
+
+## verify a file using its detached signature
+
+you must first have imported the signer’s public key.
+Assume we’ve downloaded crucial.tar.gz and the developers have also released a signature file, crucial.tar.gz.asc.
+
+    gpg --verify crucial.tar.gz.asc crucial.tar.gz
+
+## Creating a detached signature
+
+the following example will create a signature for your-file.zip called your-file.zip.asc.
+
+    gpg --armor --detach-sign your-file.zip
+
+# Basic Key Management
+
+
+## delete a key
+
+    gpg --delete-key 'myfriend@his.isp.com'
+
+
+

@@ -1,0 +1,129 @@
+# Install/Uninstall Homebrew
+
+## "not a valid keg" problem
+
+just remove the folder of the lib in the .homebrew folder and link
+
+## install
+
+    ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go/install)"
+
+## uninstall
+
+    cd `brew --prefix`
+    git checkout master
+    git ls-files -z | pbcopy
+    rm -rf Cellar
+    brew prune
+    pbpaste | xargs -0 rm
+    rm -r Library/Homebrew Library/Aliases Library/Formula Library/Contributions
+    test -d Library/LinkedKegs && rm -r Library/LinkedKegs
+    rmdir -p bin Library share/man/man1 2> /dev/null
+    rm -rf .git
+    rm -rf ~/Library/Caches/Homebrew
+    rm -rf ~/Library/Logs/Homebrew
+    rm -rf /Library/Caches/Homebrew
+
+# Update local packages
+
+## update the formulae and Homebrew itself
+
+    brew update
+
+## now find out what is outdated
+
+    brew outdated
+
+## Upgrade everything
+
+    brew upgrade
+
+## upgrade a specific formula
+
+    brew upgrade $FORMULA
+
+# Health
+
+## Check for potential problems
+
+    brew doctor
+
+## check for missing dependencies
+
+    brew missing [formulae]
+
+## list outdated formulae
+
+    brew outdated
+
+## list only formulae with multiple installed versions.
+
+    brew dirty
+
+
+# Cleanup
+
+## remove a formula entirely
+
+    brew uninstall formula_name --force.
+
+## Remove dead symlinks from the Homebrew prefix
+
+    brew prune
+
+## remove older versions and old downloads from cache
+
+    brew cleanup [--force] [-ns] [formulae]
+
+        --force : remove out-of-date keg-only brews as well
+        -n      : show what would be removed (dryrun)
+        -s      : scrubs the cache, removing downloads for even the latest versions of formula
+
+## delete downloads for installed formulae
+
+    rm -rf $(brew --cache)
+
+# Dependencies
+
+## list dependencies
+
+    brew deps $FORMULA
+
+## Install a formula's dependencies without installing the formula itself
+
+    brew install `brew deps $FORMULA`
+
+## list formulae that depend on a specific formula
+
+    brew uses [--installed] [--recursive] formula
+
+        --recursive : resolve more than one level of dependencies
+        --installed : only list installed formulae
+
+# Misc
+
+## list all installed formulae
+
+    brew list
+
+## list all installed formulae with version
+
+    brew list --versions
+
+
+       pin formulae
+              Pin the specified formulae, preventing them from being upgraded when issuing the brew upgrade com-
+              mand without arguments. See also unpin.
+
+search text|/text/
+              Perform a substring search of formula names for text. If text is surrounded with slashes, then  it
+              is  interpreted  as  a  regular expression.
+## Where does stuff get downloaded?
+
+    brew --cache
+
+## Command tab-completion for Bash
+
+Add to your ~/.bashrc
+
+    source `brew --repository`/Library/Contributions/brew_bash_completion.sh

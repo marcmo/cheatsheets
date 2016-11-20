@@ -1,0 +1,85 @@
+# ghc
+
+## installing on Mac
+
+    https://ghcformacosx.github.io/
+
+## enabled OverloadedStrings in ghci
+
+    ghci> :set -XOverloadedStrings
+
+# ghc-mod
+
+Needs correct version of cabal!! otherwise:
+
+    cabal: fromFlag NoFlag. Use fromFlagOrDefaul
+
+# cabal
+
+## sample cabal config file
+
+    repos: hackage.haskell.org:http://hackage.haskell.org/packages/archive
+    cachedir: "/Users/ethanhunt/.cabal/packages"
+    hackage-username: ""
+    hackage-password: ""
+    compiler: ghc
+    user-install: False
+    library-profiling: True
+    documentation: True
+
+
+## install package with special ghc options
+
+    cabal install --ghc-option=-XDatatypeContexts
+
+## install the dependencies from the cabal file into the newly created sandbox run
+
+    cabal install --only-dependencies
+
+Dependencies can also be built in parallel by passing -j<n> where n is the number of concurrent builds.
+
+    cabal install -j4 --only-dependencies
+
+# stackage
+
+## new project
+
+    mkdir project
+    cd project
+    wget https://www.stackage.org/snapshot/nightly-2015-05-04/cabal.config
+    stackage sandbox init
+    cabal install --only-dep
+
+
+## Traps
+
+### version of ghc incorrect
+
+all stackage config files are meant to use a specific version of ghc
+
+
+## quickly build Enum instance
+
+    instance Enum MyDataType where
+        fromEnum = fromJust . flip lookup table
+        toEnum = fromJust . flip lookup (map swap table)
+    table = [(Foo, 0), (Bar, 1), (Baz, 2)]
+
+## implement Eq and Ord
+
+    data Edge = Edge (Set String) Bool
+
+    instance Eq Edge where
+      (Edge s1 _) == (Edge s2 _) = s1 == s2
+
+    instance Ord Edge where
+      (Edge s1 _) `compare` (Edge s2 _) = s1 `compare` s2
+
+# ghci
+
+## pass parameters to main
+
+    Prelude> let main = System.Environment.getArgs >>= print
+    Prelude> :main foo bar
+    ["foo","bar"]
+

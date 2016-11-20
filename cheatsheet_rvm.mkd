@@ -1,0 +1,83 @@
+# rvm
+
+## delete gemsets
+
+### delete gemset from current interpreter
+
+    rvm gemset delete teddy
+
+### delete a gemset from a specific interpreter
+
+    rvm 2.0.0 do gemset delete teddy
+
+### remove all gems in a gemset
+
+    rvm gemset empty mygems
+
+## Install a gem in the global gemset
+
+    rvm @global do gem install ...
+
+## listing
+
+### all gems in specific gemset
+
+    rvm 1.9.3-p545@inga do gem list
+
+### list full directory path for the current gemset:
+
+    rvm gemdir
+
+### list all named gemsets for the current ruby interpreter
+
+    rvm gemset list
+
+### list all named gemsets for all interpreters
+
+    rvm gemset list_all
+
+## rename gemset
+
+    rvm gemset rename old new
+
+## remove rvm completely
+
+    rvm implode
+    gem uninstall rvm
+
+## remove all gems from gemset
+
+    rvm gemset empty gemsetA
+
+## create gemset
+
+    rvm 1.9.2-head
+    rvm gemset create albinochipmunk
+
+## create and use gemset, short in one commmand
+
+    rvm use 2.1.0-head@albinochipmunk --create
+
+## To list all named gemsets for all interpreters
+
+    rvm gemset list_all
+
+## show installed rubies
+
+    rvm list rubies
+
+## show available rubies
+
+    rvm list known
+
+## remove a ruby
+
+    rvm remove 2.1.1
+
+## Set default ruby
+
+    rvm --default use 2.1.1
+
+## To switch at any time to the ruby you have selected as default:
+
+    rvm default

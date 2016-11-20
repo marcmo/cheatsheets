@@ -1,0 +1,47 @@
+# System Stuff
+
+## Disable the Crash Reporter Dialog in Mac OS X
+
+    defaults write com.apple.CrashReporter DialogType none
+
+## empty the trash in terminal
+
+    rm -rf ~/.local/share/Trash/*
+
+# Serial Port Communication
+
+## picocom
+
+    picocom -b 115200 /dev/tty.usbserial-A
+
+## screen
+
+    screen /dev/tty.[yourSerialPortName] [yourBaudRate]
+
+for example:
+
+    screen /dev/tty.usbserial-A 9600
+
+# Screencapture
+
+## From Commandline
+
+    screencapture -oic
+
+    -o disables shadows
+    -i captures an area
+    -c copies the image to the clipboard.
+
+e.g.: This would use a timer of 5 seconds and save the image to a file:
+
+    screencapture -oi -T5 /tmp/screencapture.png
+
+## screenshots
+
+* Command-Shift-3: Take a screenshot of the screen, and save it as a file on the desktop
+* Command-Shift-4, then select an area: Take a screenshot of an area and save it as a file on the desktop
+* Command-Shift-4, then space, then click a window: Take a screenshot of a window and save it as a file on the desktop
+* Command-Control-Shift-3: Take a screenshot of the screen, and save it to the clipboard
+* Command-Control-Shift-4, then select an area: Take a screenshot of an area and save it to the clipboard
+* Command-Control-Shift-4, then space, then click a window: Take a screenshot of a window and save it to the clipboard
+

@@ -1,0 +1,31 @@
+## List all include paths used by compiler
+
+    gcc -xc++ -E -v -
+    clang -xc++ -E -v -
+
+## compile and link for C++11
+
+    clang --std=c++11 and --stdlib=libc++
+
+## debug printf
+
+    #define DEBUG 1
+    #ifdef DEBUG
+    #define debug(M, ...) printf("DEBUG %s:%d: " M, __FILE__, __LINE__, ##__VA_ARGS__)
+    #else
+    #define debug(M, ...)
+    #endif
+
+### using printf in multithreaded context
+
+turn of buffering of stdout (for stderr it is turned off by default)
+
+		setbuf(stdout, NULL);
+
+### sleep
+
+    #include <thread>         // std::this_thread::sleep_for
+    #include <chrono>         // std::chrono::seconds
+    ...
+    std::this_thread::sleep_for (std::chrono::seconds(1));
+

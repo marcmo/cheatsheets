@@ -1,0 +1,248 @@
+new image with:
+recrea / Rails 3 & Ruby 1.9.2
+- Rails 3 - Ruby 1.9.2 - Nginx with Passenger - MySQL - git - Updates rubygems - Install rails 3 - Install mysql gem - Add deploy user Tail /root/log.txt to watch it run.
+
+* boot
+server: ---------- 
+    login as root
+    apt-get update
+    apt-get upgrade --show-upgraded
+    update-alternatives --config editor
+
+# SSH
+
+#### server: ---------- 
+    mkdir .ssh
+    cd .ssh/
+#### client: ---------- 
+    scp public_key root@XXX.XXX.XXX.XXX:/home/myuser/.ssh/id_rsa.pub
+#### server: ---------- 
+    cat id_rsa.pub >> authorized_keys2
+    rm id_rsa.pub
+    chmod 700 ../.ssh
+    chmod 600 authorized_keys2
+* Lock Down SSH
+
+** disable root logins via SSH
+#### server: ---------- 
+    Edit the /etc/ssh/sshd_config file to modify the PermitRootLogin option as follows:
+      PermitRootLogin no
+(If you need to gain root access to your system you can (and should) use tools like su and sudo to do so without logging in as root.)
+
+** disable password authentication. Generate and use SSH keys to log into your system.
+#### server: ---------- 
+    In the file "/etc/ssh/sshd_config", modify PasswordAuthentication as follows:
+      PasswordAuthentication no
+    restart SSH: /etc/init.d/ssh restart
+
+** change SSH Port to s.th. non standard
+#### server: ---------- 
+
+    vim /etc/ssh/sshd_config
+      Port 22 => Port 33333
+    /etc/init.d/ssh restart  # restart SSH 
+
+#### client: ---------- 
+
+* update .ssh/config:
+
+      Host 173.230.139.188
+        port 33333
+      Host robot
+        HostName 173.230.139.188
+        User ethanhunt
+        port 33333
+
+#### USER ###
+
+-> adduser ethanhunt
+-> groupadd admin
+-> usermode -g admin ethanhunt
+-> usermod -g admin ethanhunt
+-> visudo:
+            %sudo ALL=(ALL) ALL
+            %admin ALL=(ALL) ALL
+            deploy    ALL=(ALL) ALL
+            ethanhunt    ALL=(All) ALL
+#### HOSTNAME ####
+
+    $ echo "robot" > /etc/hostname
+    $ hostname -F /etc/hostname
+    $ vim /etc/hosts
+
+use the following example file, modifying the entries to suit your setup (12.34.56.78 should be replaced with your Linode's IP address):
+
+    127.0.0.1        localhost.localdomain        localhost
+    12.34.56.78      plato.example.com             plato
+
+#### vim ####
+
+    $ sudo apt-get install ctags
+    $ git clone git://github.com/marcmo/vimfiles.git ~/.vim
+
+## enable vi mode for terminal
+
+    $ set -o vi
+
+## enable vi mode for IRB etc.
+
+put this in .inputrc : "set editing-mode vi"
+
+
+## install the interactive editor gem
+
+    gem install interactive_editor
+
+## Create an ~/.irbrc file with this content:
+
+    require 'rubygems'
+    require 'interactive_editor'
+
+#### install utilities ####
+
+- ack-grep
+- screen 
+
+    Ctrl-A c -- new window
+    Ctrl-A n -- for the next windowr
+    Ctrl-A p -- for the previous window
+    Ctrl-A K -- kill the window
+
+#### .profile ####
+
+set -o vi
+
+#### .bashrc ####
+/etc/bash_completion.d/git
+PS1='\w$(__git_ps1 " <%s>") \$ '
+gitConvertProjectFilesToDos() {
+  for n in `git ls-files -m | grep 'project'`; do echo "todos $n"; todos $n; done
+}
+gitStatusAndDiffs() {
+  echo 'git status:'; git status 
+  echo '*** workingDir 	<===> index 	  *** 	(git diff)'; git diff --stat
+  echo '*** workingDir 	<===> last commit *** 	(git diff HEAD)'; git diff --stat HEAD
+  echo '*** index 	<===> last commit *** 	(git diff --cached)'; git diff --stat --cached
+}
+gitLogsCustom() {
+  export since_time="yesterday"
+  if [ $# = 1 ]; then since_time=$1; fi
+  git log --format="%n%Cbluecommit %h %Creset:%Cred %an%Creset, %ar%n%Cgreen\"%s\"%Creset%nchanged files with this commit:" --since=$1 --name-only
+}
+gitLogsCustomShort() {
+  export since_time="one hour"
+  if [ $# = 1 ]; then since_time=$1; fi
+  git log --format="%n%Cbluecommit %h %Creset:%Cred %an%Creset, %ar%n%Cgreen\"%s\"%Creset" --since=$since_time
+}
+gitLogShort() {
+  export nr="10"
+  if [ $# = 1 ]; then nr=$1; fi
+   git log --format="%h %Cred%an %Cgreen\"%s\"%Creset" -$nr
+}
+gitAddUntrackedFolders2gitignore() {
+  for n in `git ls-files --others --exclude-standard --directory --no-empty-directory`; do echo "adding to .gitignore: $n"; echo $n >> .gitignore; done
+}
+gitDiffNoProjectFiles() {
+  git ls-files -m | ack -v "(\.c|\.)project" | ack -v ".\.launch" | xargs git diff $1
+}
+reloadProfiles() {
+  echo 'reloading .profile and .bashrc'
+  . ~/.profile
+  . ~/.bashrc
+}
+
+#### Fail2Ban to Prevent Password Attacks
+sudo apt-get install fail2ban
+sudo vim /etc/fail2ban/jail.conf
+#### nginx ####
+sudo vim /usr/local/nginx/conf/nginx.conf
+          server {
+                  listen       80;
+                  server_name www.coldflake.com coldflake.com;
+                  access_log /srv/www/coldflake.com/logs/access.log;
+                  error_log /srv/www/coldflake.com/logs/error.log;
+                  location / {
+                        root   /srv/www/coldflake.com/public_html;
+                        index  index.html index.htm;
+                  }
+                  passenger_enabled on;
+
+sudo mkdir -p /etc/local/nginx/sites-available/
+sudo mkdir /etc/local/nginx/sites-enabled   
+sudo cp /usr/local/nginx/conf/nginx.conf /etc/local/nginx/sites-available/coldflake.com
+sudo ln -s /etc/local/nginx/sites-available/coldflake.com /etc/local/nginx/sites-enabled
+sudo /etc/init.d/nginx restart
+
+test configuration without running nginx:
+    sudo /usr/local/nginx/sbin/nginx -t
+
+bind() to 0.0.0.0:80 failed (98: Address already in use)
+Identify what is listening on port 80 with: 
+    sudo lsof -i:80
+
+* make rails apps available on server from the URL http://www.coldflake.com/rails.
+To do this, make a symlink in the virtual host’s document root, and have it point to your Ruby on Rails application’s public folder. For example:
+    ln -s /webapps/mycook/public /websites/phusion/rails
+Next, set passenger_enabled on and add a passenger_base_uri option to the server block:
+    server {
+        listen       80;
+        server_name www.coldflake.com coldflake.com;
+        passenger_enabled on;
+
+        access_log /srv/www/coldflake.com/logs/access.log;
+        error_log /srv/www/coldflake.com/logs/error.log;
+        root /srv/www/coldflake.com/public_html;
+        passenger_enabled on;        # <--- These lines have
+        passenger_base_uri /rails;   # <--- been added.
+
+# gitosis
+
+* setup gitosis like in  http://scie.nti.st/2007/11/14/hosting-git-repositories-the-easy-and-secure-way
+
+#### server: ---------- 
+  - create ssh key-pair
+#### client: ---------- 
+  scp ethanhunt@coldflake.com:/tmp/key.pub .
+  add key to gitosis, commit
+server: ---------- 
+  git clone git@coldflake.com:blog.git
+#### setup capistrano ####
+#### client: ---------- 
+* create rails app
+* edit deploy.rb:
+    set :application, "blog"
+    set :repository, "ssh://ethanhunt@173.230.139.188/home/ethanhunt/dev/git/railsapps.git"
+    default_run_options[:pty] = true
+    set :scm, :git
+    set :port, 31953
+    set :deploy_to, "/srv/www/coldflake.com/public_html"
+    server "173.230.139.188", :app, :web, :db, :primary => true
+* test capistrano: Capfile: 
+    task :search_libs, :hosts => "www.coldflake.com" do
+      run "ls -x1 /usr/lib | grep -i xml"
+    end
+server: ---------- 
+  sudo gem install activesupport -v 3.0.1
+#### mysql ####
+* reset root password (linode recipe):
+If you've forgotten your root password, use the package reconfiguration tool to change that password:
+    dpkg-reconfigure mysql-server-5.1
+* Set / change / reset the MySQL root password on Ubuntu Linux. 
+   1. Stop the MySQL Server.
+      sudo /etc/init.d/mysql stop
+   2. Start the mysqld configuration.
+      sudo mysqld --skip-grant-tables &
+   3. Login to MySQL as root.
+      mysql -u root mysql
+   4. Replace YOURNEWPASSWORD with your new password!
+      UPDATE user SET Password=PASSWORD('YOURNEWPASSWORD') WHERE User='root'; FLUSH PRIVILEGES; exit;
+Note: This method is not regarded as the securest way of resetting the password. However it works.
+* start mysql server on macos: 
+    sudo mysqld --user=root
+
+#### permissions ####
+
+change ownership to enable installation without sudo for package managers like npm or brew:
+sudo chown -R $USER /usr/local/{share/man,bin,lib/node}
+
+

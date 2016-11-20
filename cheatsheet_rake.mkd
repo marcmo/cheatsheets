@@ -1,0 +1,109 @@
+## manually invoke rake task
+
+This always executes the task, but it doesn't execute its dependencies:
+
+    Rake::Task["build"].execute
+
+This one executes the dependencies, but it only executes the task if it has not already been invoked:
+
+    Rake::Task["build"].invoke
+
+This first resets the task's `already_invoked` state, allowing the task to then be executed again,
+dependencies and all:
+
+    Rake::Task["build"].reenable
+    Rake::Task["build"].invoke
+
+## early exit from rake task
+
+A Rake task is basically a block. A block, except lambdas, doesn't support return but you can skip
+to the next statement using next which in a rake task has the same effect of using return in a
+method.
+
+    task :foo do
+      puts "printed"
+      next
+      puts "never printed"
+    end
+
+## namespaces
+
+    namespace :server do
+
+      task :backup do
+        puts "In Example Backup Web-Server"
+      end
+
+    end
+
+    task :default => 'server:backup'
+
+rake -T => server:backup         Backup Web Server
+
+# arguments in tasks
+
+## call task with arguments
+
+    task :do_release, [:release_name] do |t,args|
+      name = args[:release_name]
+      puts "argument was: #{name}"
+    end
+
+## default-arguments in tasks
+
+    task :flash_cam, :cam_address do |t, args|
+      args.with_defaults(:cam_address => TargetCam)
+      sh "this is my address:#{args.cam_address}"
+    end
+
+## pass arguments around
+
+    task :test, [:dir] => [:prepare_testdir] do |t,args|
+      puts args.inspect # {:dir=>"foo"}
+    end
+
+    task :prepare_testdir, :dir do |t, args|
+      puts args.inspect # {:dir=>"foo"}
+    end
+
+# Building C/C++ Sources
+
+this is a sample rake script to build a C++ project
+
+    require 'rake/clean'
+
+    BUILD_DIR="BuildDir"
+    SRC_DIR="tests"
+    SOURCE_FILES = FileList.new("#{SRC_DIR}/**/*.cpp")
+    CLEAN.include(BUILD_DIR)
+    CC="g++"
+    CFLAGS="-c -Wall -O0 -g3 -std=c++11"
+    INC=FileList["include"].pathmap("-I%p")
+    DELEGATETEST="#{BUILD_DIR}/delegateTest.exe"
+
+    directory BUILD_DIR
+
+    task :run => [DELEGATETEST] do
+      sh "./#{DELEGATETEST}"
+    end
+
+    task :default => [DELEGATETEST]
+
+    file DELEGATETEST => "#{BUILD_DIR}/DelegateTests.o" do
+      sh "#{CC} -o #{DELEGATETEST} #{BUILD_DIR}/DelegateTests.o"
+    end
+
+    # rule-task that knows how to get an object file from a source file
+    # source files can be in a differnet directory 
+    rule ".o" => [->(f){locate_source(f)}, BUILD_DIR] do |t|
+      sh "#{CC} #{CFLAGS} #{INC} -o#{t.name} #{t.source}"
+    end
+
+    # locate a sourcefile for a given object-file
+    def locate_source(o_file)
+      SOURCE_FILES.detect { |f|
+        f.ext('') == o_file.pathmap("%{^#{BUILD_DIR},#{SRC_DIR}}X")
+      }
+    end
+
+

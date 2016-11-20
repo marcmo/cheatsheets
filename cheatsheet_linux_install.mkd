@@ -1,0 +1,73 @@
+## setup git
+
+sudo apt install tig
+sudo apt install gitk
+
+## Dropbox
+
+## zsh/Oh-my-zsh
+
+sudo apt install zsh
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+mv .zshrc .zshrc_original
+
+## Dotfiles
+
+ln -svf Dropbox/dotfiles/.zshrc
+ln -svf Dropbox/dotfiles/.gitk
+ln -svf Dropbox/dotfiles/.tmux.conf
+ln -svf Dropbox/dotfiles/.git_template
+ln -svf Dropbox/dotfiles/.gemrc
+ln -svf Dropbox/dotfiles/.fzf.bash_common
+ln -svf Dropbox/dotfiles/.docker_scripts_linux .docker_scripts
+ln -svf Dropbox/dotfiles/.bashrc_linux_work .bashrc
+ln -svf Dropbox/dotfiles/.editrc
+ln -svf Dropbox/dotfiles/.bashrc_common
+ln -svf Dropbox/dotfiles/.gitignore
+ln -svf Dropbox/dotfiles/.inputrc
+ln -svf Dropbox/dotfiles/.profile_linux_work .profile
+
+## vim
+
+sudo apt install neovim
+
+sudo apt install python3
+sudo apt install python-dev
+sudo apt-get install software-properties-common
+sudo apt install ruby
+sudo apt install ruby-dev
+sudo apt install xclip
+sudo apt install clang
+
+## docker
+
+sudo apt install -y docker.io
+sudo apt install openssh-server
+
+## basics
+
+sudo apt install silversearcher-ag
+sudo apt install tree
+sudo apt install cmake
+sudo apt install astyle
+
+## linux UI
+
+sudo apt install albert
+sudo apt install gnome-tweak-tool
+sudo apt install wireshark
+sudo apt install meld
+sudo apt install skype
+
+## entr (Run arbitrary commands when files change)
+
+sudo apt install entr
+
+## utilities
+
+sudo apt install tftp
+sudo apt install mosh
+sudo apt install ack-grep
+sudo apt install picocom
+sudo apt install htop
+

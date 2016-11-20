@@ -1,0 +1,85 @@
+# tmux -- terminal multiplexer
+
+## Managing tmux sessions:
+
+    tmux                     # start tmux server or create a new session
+    tmux new -s session_name # make new named session
+    tmux at -t session_name  # attach to exist session (allowing shared sessions)
+    tmux ls                  # list running tmux sessions
+    tmux kill-server
+    tmux attach -d           # re-attach an attached session (detaching it from elsewhere)
+    tmux attach              # re-attach an attached session (keeping it attached elsewhere)
+
+## Commands (used within a running tmux session):
+
+NOTE: All commands need to be prefixed with the action key.
+      (By default, this is CTRL-b)
+
+    c   - create new window
+    :new-session -s name - create new session
+    n/l - next/last window
+    &   - kill current window
+
+    %   - split window, adding a vertical pane to the right
+    "   - split window, adding an horizontal pane below
+    ←/→ - move focus to left/right pane
+    ↑/↓ - move focus to upper/lower pane
+
+    !   - Break current pane into new window
+    x   - Kill the current pane.
+    d   - detach the current client
+
+    [   - enter copy mode (then use emacs select/yank keys)
+        * press CTRL-SPACE or CTRL-@ to start selecting text
+        * move cursor to end of desired text
+        * press ALT-w to copy selected text
+
+    ]   - paste copied text
+
+    ?   - show tmux key bindings
+
+    $ <newname> - rename-session to newname
+    , <newname> - rename-window to newname
+    w   - list windows
+    #   - go to window #
+    l   - go to last                   - active window
+    n   - go to next window
+    p   - go to previous window
+    s   - list sessions
+    o   - switch to another pane
+    ^o  - swap location of panes
+    t   - show time
+    q   - show numeric values of panes
+    space - cycle layout
+
+## pane movement
+
+    bind-key j command-prompt -p "join pane from:"  "join-pane -s '%%'"
+    bind-key s command-prompt -p "send pane to:"  "join-pane -t '%%'"
+
+The first grabs the pane from the target window and joins it to the current, the second does the reverse.
+
+## copy text
+
+visually select with mouse
+<C-a><C-y>
+
+## Reloading tmux config
+
+This can be done either from within tmux, by pressing Ctrl+B and then : to bring up a command prompt, and typing:
+
+    :source-file ~/.tmux.conf
+
+Or simply from a shell:
+
+    $ tmux source-file ~/.tmux.conf
+
+## clear scrollback buffer
+
+Put this into your .tmux.conf file:
+
+    bind -n C-k clear-history
+
+1. "clear" in terminal
+2. <C-k>
+

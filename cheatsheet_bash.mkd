@@ -1,0 +1,1105 @@
+# command line shortcuts (emacs-mode)
+
+## Moving the cursor:
+
+    Ctrl + a    Go to the beginning of the line (Home)
+    Ctrl + e    Go to the End of the line (End)
+    Ctrl + f    Forward one character
+    Ctrl + b    Backward one character
+    Alt + b     Back (left) one word      or use Option+Right-Arrow
+    Alt + f     Forward (right) one word  or use Option+Left-Arrow
+    Ctrl + xx  Toggle between the start of line and current cursor position
+
+## Editing:
+
+    Ctrl + L    Clear the Screen, similar to the clear command
+    Alt + Del   Delete the Word before the cursor.
+    Alt + d     Delete the Word after the cursor.
+    Ctrl + d    Delete character under the cursor
+    Ctrl + h    Delete character before the cursor (backspace)
+
+    Ctrl + w    Cut the Word before the cursor to the clipboard.
+    Ctrl + k    Cut the Line after the cursor to the clipboard.
+    Ctrl + u    Cut/delete the Line before the cursor position.
+
+    Alt + t   Swap current word with previous
+    Ctrl + t   Swap the last two characters before the cursor (typo).
+    Esc  + t   Swap the last two words before the cursor.
+
+    ctrl + y   Paste the last thing to be cut (yank)
+    Alt + u   UPPER capitalize every character from the cursor to the end of the current word.
+    Alt + l   Lower the case of every character from the cursor to the end of the current word.
+    Alt + c   Capitalize the character under the cursor and move to the end of the word.
+    Alt + r   Cancel the changes and put back the line as it was in the history (revert).
+    ctrl + _   Undo
+
+# Intersection of two lists
+
+    want:
+    one=`ls one`
+    two=`ls two`
+    intersection $one $two
+
+## using comm
+
+    comm -12  <(ls one) <(ls two)
+
+# ncurses version of du
+
+    ncdu
+
+# delete content of file
+
+    truncate -s 0 filename
+
+# sort by column
+
+Sort file by 2. column, throwing out duplicates
+
+    sort -u -t, -k1,1 file
+
+    -u for unique
+    -t, so comma is the delimiter
+    -k1,1 for the key field 1
+
+# Groups
+
+## add existing user to group
+
+    sudo usermod -a -G nginx ethanhunt
+
+## check the groups a user belongs to
+
+    groups myuser
+
+## move everything but one folder
+
+see http://stackoverflow.com/questions/4612157/how-to-use-mv-command-to-move-files-except-those-in-a-specific-directory
+
+Lets's assume the dir structure is like,
+
+    |parent
+        |--child1
+        |--child2
+        |--grandChild1
+        |--grandChild2
+        |--grandChild3
+        |--grandChild4
+        |--grandChild5
+        |--grandChild6
+
+And we need to move files so that it would appear like,
+
+|parent
+    |--child1
+    |   |--grandChild1
+    |   |--grandChild2
+    |   |--grandChild3
+    |   |--grandChild4
+    |   |--grandChild5
+    |   |--grandChild6
+    |--child2
+
+In this case, you need to exclude two directories child1 and child2, and move rest of the directories in to child1 directory.
+
+    $ mv !(child1|child2) child1
+
+## watch for file changes
+
+    fswatch -o feed.xml | xargs -n1 -I{} sh -c 'git status; date'
+
+## xargs with multiple commands as argument
+
+from http://stackoverflow.com/questions/6958689/xargs-with-multiple-commands-as-argument
+
+    cat a.txt | xargs -I % sh -c 'command1; command2; ...'
+
+## logfile monitoring
+
+    tail -f logfile.log
+
+## What is the difference between “source” and “.” in bash?
+
+source and . are synonymous in bash
+
+http://askubuntu.com/questions/25488/what-is-the-difference-between-source-and-in-bash
+
+## rsync
+
+    rsync options source destination
+
+options:
+
+    -v                      verbose
+    -r                      copies data recursively (but don’t preserve timestamps and permission
+                            while transferring data
+    -a                      archive mode, archive mode allows copying files recursively and it also
+                            preserves symbolic links, file permissions, user & group ownerships and timestamps
+    -z                      compress file data
+    -h                      human-readable, output numbers in a human-readable format
+    -u, --update            skip files that are newer on the receiver
+        --append            append data onto shorter files
+    -n, --dry-run           show what would have been transferred
+        --existing          skip creating new files on receiver
+    -m, --prune-empty-dirs  prune empty directory chains from file-list
+        --exclude=PATTERN   exclude files matching PATTERN
+        --include=PATTERN   don't exclude files matching PATTERN
+    -h, --human-readable    output numbers in a human-readable format
+        --progress          show progress during transfer
+
+### Copy/Sync File locally
+
+    $ rsync -zvh backup.tar /tmp/backups/
+
+even creates missing folders
+
+### Copy/Sync a Directory
+
+locally
+
+    $ rsync -avzh /root/rpmpkgs /tmp/backups/
+
+local -> remote
+
+    $ rsync -avzh rpmpkgs/ root@192.168.0.101:/home/
+
+remote -> local
+
+    $ rsync -avzh root@192.168.0.100:/home/tarunika/rpmpkgs /tmp/myrpms
+
+### rsync over SSH
+
+    $ rsync -avzhe ssh root@192.168.0.100:/root/install.log /tmp/
+    $ rsync -avzhe ssh backup.tar root@192.168.0.100:/backups/
+
+### –delete Option
+
+use the `–delete` option to delete files that are not there in source directory.
+
+    $ rsync -avz --delete root@192.168.0.100:/var/lib/rpm/ .
+
+### Automatically delete source Files after successful Transfer
+
+    $ rsync --remove-source-files -zvh backup.tar /tmp/backups/
+
+
+## concatenate strings in bash
+
+(from http://stackoverflow.com/questions/4181703/how-can-i-concatenate-string-variables-in-bash)
+
+    foo="Hello"
+    foo="$foo World"
+    echo $foo
+    > Hello World
+
+In general to concatenate two variables you can just write them one after another:
+
+    a='hello'
+    b='world'
+    c=$a$b
+    echo $c
+    > helloworld
+
+## copy directory while preserving permissions/ownership
+
+### using cp
+
+    sudo cp -rp /home/my_home /media/backup/my_home
+
+From cp manpage:
+
+    -p     same as --preserve=mode,ownership,timestamps
+
+    --preserve[=ATTR_LIST]
+              preserve the specified attributes (default: mode,ownership,timestamps),
+              if possible additional attributes: context, links, xattr, all
+
+### using rsync
+
+    sudo rsync -a /home/my_home/ /media/backup/my_home/
+
+From the rsync manpage:
+
+    -a, --archive
+              This  is  equivalent  to  -rlptgoD.  It  is a quick way of saying you want
+              recursion and want to preserve almost everything (with -H being a  notable
+              omission).    The   only  exception  to  the  above  equivalence  is  when
+              --files-from is specified, in which case -r is not implied.
+
+              Note that -a does not preserve hardlinks, because finding  multiply-linked
+              files is expensive.  You must separately specify -H.
+
+### using tar
+
+    tar cf - my_home | (cd /media/backup; sudo tar xf - )
+
+tar keeps permissions, ownership and directory structure intact, but converts everything into a
+stream of bytes. You run a "subshell" (the parenthesized commands) that change directory, and then
+get tar to reverse the conversion. A steam of bytes becomes directories and files with correct
+ownership and permissions.
+
+## search/replace in multiple files
+
+rename a string in matching files:
+* replace every occurence of `EWS_DEACTIVATED` with `KEY_VALID`
+* only in `*.h` and `*.cpp` files
+
+    ag -l -G "\.(h|cpp)" EWS_DEACTIVATED -l | xargs sed -i 's/EWS_DEACTIVATED/KEY_VALID/g'
+
+### multiple replacements in one go
+
+    for i in uint8 uint16 uint32 uint64; do ag -l -G "\.(h|cpp)" "\b${i}\b" -l | xargs sed -i "s/\b$i\b/${i}_t/g"; done
+
+* `-l` only prints the names of the files
+
+## sort output of command by length
+
+    $ locate stdarg.h | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -10
+    /usr/include/c++/4.6/tr1/stdarg.h
+    /usr/lib/syslinux/com32/include/stdarg.h
+    /usr/lib/gcc/x86_64-linux-gnu/4.6/include/stdarg.h
+    ...
+
+## login as different user
+
+    $ whoami
+    user1
+    $ sudo su - user2
+    Password:
+    $ whoami
+    user2
+    $ exit
+    logout
+
+# tee
+
+## log picocom output in logfile also
+
+    picocom -b 115200 /dev/tty.usbserial-1a122C | tee serial_output.txt
+
+## add times to log file
+
+    picocom -b 115200 /dev/tty.usbserial-1a122C | awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush(); }' | tee serial_output.txt
+
+# cp
+
+## copy but not overwrite
+
+    -n, --no-clobber
+              do not overwrite an existing file (overrides a previous -i option)
+
+## How to have the cp command create any necessary folders for copying a file to a destination
+
+    --parents'
+       Form the name of each destination file by appending to the target
+       directory a slash and the specified name of the source file.  The
+       last argument given tocp' must be the name of an existing directory. For example, the command:
+
+      cp --parents a/b/c existing_dir
+
+    copies the file `a/b/c' to `existing_dir/a/b/c', creating any
+    missing intermediate directories.
+    /tmp $ mkdir foo
+    /tmp $ mkdir foo/foo
+    /tmp $ touch foo/foo/foo.txt
+    /tmp $ mkdir bar
+    /tmp $ cp --parents foo/foo/foo.txt bar
+    /tmp $ ls bar/foo/foo
+    foo.txt
+
+from http://blog.urfix.com/5-linux-commands/
+
+## Start COMMAND, and kill it if still running after 5 seconds
+
+    timeout 5s COMMAND
+
+## Convert Youtube videos to MP3
+
+    youtube-dl -t --extract-audio --audio-format mp3 YOUTUBE_URL_HERE
+
+youtube-dl has this functionality built in. If you’re running an older version of youtube-dl, you can update it using `youtube-dl -U` (although if you have an older version, it probably doesn’t download youtube videos anyway.)
+
+youtube-dl –help will show you other options that may come in useful.
+
+## Limit the cpu usage of a process
+
+    sudo cpulimit -p pid -l 50
+
+This will limit the average amount of CPU it consumes.
+
+## Target a specific column for pattern substitution
+
+    awk '{gsub("foo","bar",$5)}1' file
+
+Awk replaces every instance of foo with bar in the 5th column only.
+
+## Redirect tar extract to another directory
+
+    tar xfz filename.tar.gz -C PathToDirectory
+
+The command extracting the tar contents into particular directory …
+
+## subshells to copy directory
+from http://www.alleft.com/sysadmin/process-substitution-subshells-that-rock/
+
+    (cd /the/source && tar cf - .) | (cd /the/target && tar xf -)
+
+This is a nice reliable cross-platform way of copying an entire directory from one path to another,
+and it works because the parenthesis spawn two subshells that run the “cd && tar”
+
+## ls command: finding the largest files in a directory
+
+    $ ls -lS
+
+only the 10 largest files:
+
+    $ ls -lS | head +10
+
+## handling terminal color escape sequences in less
+
+    $ colordiff A.mkd B.mkd | less -R
+
+## nice aliases
+
+http://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
+
+## change into temp directory
+
+    mcd () {
+      mkdir -p $1;
+      cd $1
+    }
+
+## show the 10 most recent files
+
+    ls -l -t | head -10
+
+## delete all symbolic links
+
+    find -type l -delete
+
+for older find versions:
+
+    find -type l -exec rm {} \;
+
+# rename
+
+## rename part of filename
+
+Problem: replace all 'Aug' in filenames with '08'
+
+    rename 's/Aug/08/' *.*
+
+might need to install the 'rename' command, e.g. `brew install rename` on OSX
+
+## Sanitize filename
+
+with -z (--sanitize), shortcut for "--nows --noctrl --nometa --trim".
+
+    tmp > ls
+    kuh macht mu.tif
+    tmp > rename -n -z *
+    'kuh macht mu.tif' would be renamed to 'kuh_macht_mu.tif'
+
+* nows   -> Replace all sequences of whitespace with single "_"
+* noctrl -> Replace all sequences of control characters with single "_"
+* nometa -> Replace every shell meta-character with "_"
+* trim   -> Remove spaces and underscores from left and right end
+
+## put files in folders according to their endings
+
+    rename -p -X -e '$_ = "$EXT/$_" if @EXT' *
+
+* p    -> creates directories if needed
+* X    -> chop of extension and append after the operation
+* e    -> evaluate perl expression
+* $EXT -> A string containing the accumulated extensions saved by "-X" switches, without a leading dot
+* @EXT -> An array containing the accumulated extensions saved by "-X" switches, from right to left, without any dots
+
+## using cpp to find included header files
+
+    cpp -H -Iinclude A.cpp 2>/dev/null | grep '#.*.h' | tr -d '""'| awk '{print $3}' | sort | uniq
+
+## pipe stderr
+
+find header dependencies (printed on stderr) and highlight those using ack
+
+    clang++ -I../gmock/fused-src -H A.cpp |& ack -i endian.h --passthru
+
+# more on find
+
+http://pubs.opengroup.org/onlinepubs/9699919799/utilities/find.html
+
+# ssh
+
+http://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
+
+# netcat
+
+http://www.g-loaded.eu/2006/11/06/netcat-a-couple-of-useful-examples/
+
+
+## list directories only
+from http://superuser.com/questions/335376/how-to-list-folders-using-bash-commands
+
+    ls -d -- */
+
+# Mount USB
+
+    lsblk
+    sudo mkdir /media/usbstick
+    sudo mount /dev/sdf /media/usbstick
+
+# Pipes and Rediretion
+
+also good: http://www.westwind.com/reference/os-x/commandline/pipes.html
+
+Redirection Commands: (from http://www.tutorialspoint.com/unix/unix-io-redirections.htm)
+Following is the complete list of commands which you can use for redirection:
+
+## stdout to file
+
+    ls > file.txt
+
+also possible to append to a file
+
+    ls >> file.txt
+
+## stderr to file
+
+    grep *.rb 2> err.txt
+
+## Merge output from stream n with stream m.
+
+    n >& m
+
+### stdout to stderr
+
+    grep da * 1>&2
+
+### stderr to stdout
+
+    grep * 2>&1
+
+### redirect stdout and stderr to file
+
+    rm -rf tmp &> /dev/null
+
+## Program exec reads its input from file.
+
+    exec < file
+
+also possible:
+
+    cat file | exec
+
+## Merge input from stream n with stream m.
+
+    n <& m
+
+# archives
+
+## view zipfiles
+
+    $ zipinfo tmp.zip
+
+or
+
+    $ unzip -l tmp.zip
+
+## repeatedly execute command
+
+    $ for i in {1..100}; do cat big.txt >> big100.txt ; done
+
+## create tar file
+
+    tar cvf archive_name.tar dirname/
+    tar cvzf archive_name.tar.gz dirname/
+    tar cvfj archive_name.tar.bz2 dirname/
+
+## extract from tar file
+
+    tar xvf archive_name.tar
+    tar xvfz archive_name.tar.gz
+    tar xvfj archive_name.tar.bz2
+
+## Adding a file or directory to an existing archive
+(from http://www.thegeekstuff.com/2010/04/unix-tar-command-examples/)
+
+## append a file to `*.tar` file
+
+    $ tar rvf archive_name.tar newfile
+
+## Adding a directory to the tar
+
+    $ tar rvf archive_name.tar newdir/
+
+## find excluding directories
+
+    find . -name doc -a -type d -prune -o -name *.java
+
+find all java files but exclude the doc directories
+
+## find with mutliple filename patterns
+
+    find . -name "*.c" -o -name "*.h" -o -name "*.cpp"
+
+## find files that DO NOT match a pattern or other criteria
+(from http://www.giannistsakiris.com/index.php/2008/12/20/unix-how-to-find-files-that-do-not-match-a-pattern-or-other-criteria/)
+
+    find . -type f ! -iname "*.mp3"
+
+The above command will find all files that have not an .mp3 extension.
+
+## convert hex decimal
+
+## Base conversion using printf shell builtin
+
+### convert decimal to hex
+
+    printf "%x\n" 4095
+    fff
+
+### convert hex to decimal
+
+    printf "%d\n" 0xfff
+    4095
+
+### shellscript using bc
+
+    h2d(){ echo "ibase=16; $@"|bc }
+    d2h(){ echo "obase=16; $@"|bc }
+
+## copy file while monitoring progress
+
+### using pv
+    /tmp $ pv tmp.tar.gz > /media/xyz/tmp.tar.gz
+
+3.55GB 0:03:13 [31.3MB/s] [===============>           ]
+
+from: http://www.cyberciti.biz/open-source/command-line-hacks/pv-command-examples/
+
+### using dd
+
+    dd if=Windows7HomePremium_Clean.tar.gz of=../Transcend/windows.tar.gz  & DDPID=$! ; sleep 1 ; while kill -USR1 $DDPID ; do sleep 5; done
+
+from: http://www.commandlinefu.com/commands/view/4553/copy-a-file-using-dd-and-watch-its-progress
+
+# text processing
+
+## tr: character translation or manipulation
+
+### split file into words
+
+tr -sc 'A-Za-z' '\n' < input.txt
+
+# operations on multiple file
+
+## extract audio from mp4 files
+
+inspired from [this site](http://www.debian-administration.org/articles/150)
+
+### replace spaces with _
+
+    for file in *; do mv "$file" `echo $file | tr ' ' '_'` ; done
+
+### using substitution operation
+
+    for i in *.mp4; do ffmpeg -i "$i" "${i/.mp4}.mp3"; done
+
+### using basename
+
+    for i in *.mp4; do ffmpeg -i "$i" "`basename $i .mp4`.mp3"; done
+
+# split files
+
+    split -b 75m input.txt
+
+# splitting strings
+
+## split PATH into it's elements
+    function echoPath() {
+      IFS=':' read -ra ADDR <<< "$PATH"
+      for i in "${ADDR[@]}"; do echo $i; done
+    }
+
+## split PATH using tr
+
+    echo $PATH | tr ":" "\n" | sort
+
+# locate
+
+## refresh database
+
+    sudo updatedb
+
+# tar
+
+## extract tar archive into folder
+
+    $ tar xvzf tmp.tar.gz -C /targetDir
+
+### calculate the size of all files found by find
+
+    find . -name "*.a" -ls | awk '{total += $7} END {print total}'
+
+# dd
+
+## track progress of dd
+
+### find out the process id of the dd process
+
+    $ pgrep -l '^dd$'
+    $ 4523 dd
+
+### send the USR1 signal to the dd process:
+
+    $ kill -USR1 4523
+
+### when USR1 signal is detected, dd will print out the current statistics to its STDERR
+
+    $ 12312412312 bytes (xxx GB) copied, 4232.03 s, 13.5 MB/s
+
+
+### After reporting the status, dd will resume copying. to keep it going use watch:
+
+  $ watch -n 10 kill -USR1 4523
+
+# df - to check free disk space
+
+Type df -h or df -k to list free disk space:
+
+    $ df -h
+
+OR
+
+    $ df -k
+
+# Pass command line argument to bash alias command
+
+    function foo() { /path/to/command "$@" ;}
+
+Now you can call foo():
+foo arg1 arg2 argN
+(see http://www.cyberciti.biz/faq/linux-unix-pass-argument-to-alias-command/)
+
+# diff
+
+## find out difference between folders
+
+    diff -rq folder1 folder2
+
+-r  look at each directory recursively
+-q  sets diff brief mode
+
+# cut and paste
+
+## count loc in a codebase
+
+* find all source code files
+* count number of lines for each
+* cut out only the number
+* combine the numbers from stdin with +
+* feed the resulting string to bc
+
+    find -E . -regex ".*\.(cpp|c|h|hpp)" | xargs -n1 wc -l | cut -f1 -d'.' | paste -sd+ - | bc
+
+# zip
+
+## create a file "archivefile1.zip" which contains a copy of the files doc1, doc2, and doc3
+
+    zip archivefile1 doc1 doc2 doc3
+
+## copies the directory "papers" into "archivefile2.zip".
+
+    zip -r archivefile2 papers
+
+## Creating a password protected archives
+
+    zip -e important.zip file1 file2
+
+## combine multipart zip file
+
+    cat zipfileparts.* > combined.zip
+    zip -F combined.zip --out fixed.zip
+    unzip fixed.zip
+
+## extract 7z
+
+    p7zip -d filename.7z
+
+## writes the files extracted from "archivefile1.zip" to the current directory.
+
+    unzip archivefile1.zip
+
+# Run a Command Repeatedly and Display the Output
+
+watch runs command repeatedly, displaying its output (the first screenfull). This allows you to watch the program output change over time. By default, the program is run every 2 seconds. watch is very similar to tail.
+
+    $ watch -n 60 ls -l # will execute ls -l every minute
+
+# print sizes of folders sorted by size
+
+    $ du -s ./* | sort -n | cut -f 2- | xargs -Ix du -sh x
+
+# what every Linux user should know
+(taken from http://www.xydo.com/toolbar/17462376-what_are_some_lesser_known_but_useful_unix_commands)
+
+## Basics
+
+* Learn basic bash. Actually, read the whole bash man page; it's pretty easy to follow and not that
+  long. Alternate shells can be nice, but bash is powerful and always available (learning mainly zsh
+  or tcsh restricts you in many situations).
+* Learn vim. There's really no competition for random Linux editing (even if you use Emacs or
+  Eclipse most of the time).
+* Know ssh, and the basics of passwordless authentication, via ssh-agent, ssh-add, etc.
+* Be familiar with bash job management: &, Ctrl-Z, Ctrl-C, jobs, fg, bg, kill, etc.
+* Basic file management: ls and ls -l (in particular, learn what every column in "ls -l" means),
+  less, head, tail and tail -f, ln and ln -s (learn the differences and advantages of hard versus
+  soft links), chown, chmod, du (for a quick summary of disk usage: `du -sk *`), df, mount.
+* Basic network management: ip or ifconfig, dig.
+* Know regular expressions well, and the various flags to grep/egrep. The -o, -A, and -B options are
+  worth knowing.
+* Learn to use aptitude or yum (depending on distro) to find and install packages.
+
+## Everyday use
+
+* In bash, use Ctrl-R to search through command history.
+* In bash, use Ctrl-W to kill the last word, and Ctrl-U to kill the line. See man readline for
+  default keybindings in bash. There are a lot. For example Alt-. cycles through prevous arguments,
+  and `Alt-*` expands a glob.
+* To go back to the previous working directory: cd -
+* Use xargs (or parallel). It's very powerful. Note you can control how many items execute per line
+  (-L) as well as parallelism (-P). If you're not sure if it'll do the right thing, use xargs echo
+  first. Also, -I{} is handy. Examples:
+* `find . -name \*.py | xargs grep some_function`
+* cat hosts | xargs -I{} ssh root@{} hostname
+* pstree -p is a helpful display of the process tree.
+* Use pgrep and pkill to find or signal processes by name (-f is helpful).
+* Know the various signals you can send processes. For example, to suspend a process, use kill -STOP
+  [pid].  For the full list, see man 7 signal
+* Use nohup or disown if you want a background process to keep running forever.
+* Check what processes are listening via netstat -lntp. See also lsof.
+* In bash scripts, use set -x for debugging output. Use set -e to abort on errors. Consider using
+  set -o pipefail as well, to be strict about errors (though this topic is a bit subtle). For more
+  involved scripts, also use trap.
+* In bash scripts, subshells (written with parentheses) are convenient ways to group commands. A
+  common example is to temporarily move to a different working directory, e.g.
+
+    # do something in current dir
+    (cd /some/other/dir; other-command)
+    # continue in original dir
+
+* In bash, note there are lots of kinds of variable expansion. Checking a variable exists:
+  `${name:?error message}`. For example, if a bash script requires a single argument, just write
+  `input_file=${1:?usage: $0 input_file}`. Arithmetic expansion: i=$(( (i + 1) % 5 )). Sequences:
+  {1..10}. Trimming of strings: `${var%suffix}` and `${var#prefix}`. For example if var=foo.pdf, then
+  echo ${var%.pdf}.txt prints "foo.txt".
+* The output of a command can be treated like a file via <(some command). For example, compare local
+  /etc/hosts with a remote one: diff /etc/hosts <(ssh somehost cat /etc/hosts)
+* Know about "here documents" in bash, as in `cat <<EOF` ....
+* In bash, redirect both standard output and standard error via: `some-command >logfile 2>&1`. Often,
+  to ensure a command does not leave an open file handle to standard input, tying it to the terminal
+  you are in, it is also good practice to add `</dev/null`.
+* Use man ascii for a good ASCII table, with hex and decimal values.
+* On remote ssh sessions, use screen or dtach to save your session, in case it is interrupted.
+* For web debugging, curl and curl -I are handy, and/or their wget equivalents.
+* To convert HTML to text: `lynx -dump -stdin`
+* If you must handle XML, xmlstarlet is good.
+* For Amazon S3, s3cmd is convenient (albeit immature, with occasional misfeatures).
+* In ssh, knowing how to port tunnel with -L or -D (and occasionally -R) is useful, e.g. to access
+  web sites from a remote server.
+* It can be useful to make a few optimizations to your ssh configuration; for example, this
+  .ssh/config contains settings to avoid dropped connections in certain network environments, not
+  require confirmation connecting to new hosts, forward authentication, and use compression (which
+  is helpful with scp over low-bandwidth connections):
+
+    TCPKeepAlive=yes
+    ServerAliveInterval=15
+    ServerAliveCountMax=6
+    StrictHostKeyChecking=no
+    Compression=yes
+    ForwardAgent=yes
+
+* If you are halfway through typing a command but change your mind, hit Alt-# to add a # at the
+  beginning and enter it as a comment (or use Ctrl-A, #, enter). You can then return to it later via
+  command history.
+
+## Data processing
+* Know about sort and uniq (including uniq's -u and -d options).
+* Know about cut, paste, and join to manipulate text files. Many people use cut but forget about
+  join.
+* It is remarkably helpful sometimes that you can do set intersection, union, and difference of text
+  files via sort/uniq. Suppose a and b are text files that are already uniqued. This is fast, and
+  works on files of arbitrary size, up to many gigabytes. (Sort is not limited by memory, though you
+  may need to use the -T option if /tmp is on a small root partition.)
+* cat a b | sort | uniq > c   # c is a union b
+* cat a b | sort | uniq -d > c   # c is a intersect b
+* cat a b b | sort | uniq -u > c   # c is set difference a - b
+* Know that locale affects a lot of command line tools, including sorting order and performance.
+  Most Linux installations will set LANG or other locale variables to a local setting like US
+  English. This can make sort or other commands run many times slower. (Note that even if you use
+  UTF-8 text, you can safely sort by ASCII order for many purposes.) To disable slow i18n routines
+  and use traditional byte-based sort order, use `export LC_ALL=C` (in fact, consider putting this in
+  your .bashrc).
+* Know basic awk for simple data munging. For example, summing all numbers in the third column of a
+  text file: awk '{ x += $3 } END { print x }'. This is probably 3X faster and 3X shorter than
+  equivalent Python.
+* Use shuf to shuffle or select random lines from a file.
+* Know sort's options. Know how keys work (-t and -k). In particular, watch out that you need to
+  write -k1,1 to sort by only the first field; -k1 means sort according to the whole line.
+* Stable sort (sort -s) can be useful. For example, to sort first by field 2, then secondarily by
+  field 1, you can use sort -k1,1 | sort -s -k2,2
+* If you ever need to write a tab literal in a command line in bash (e.g. for the -t argument to
+  sort), press Ctrl-V <tab>.
+* For binary files, use hd for simple hex dumps and bvi for binary editing.
+* Also for binary files, strings (plus grep, etc.) lets you find bits of text.
+* To convert text encodings, try iconv. Or uconv for more advanced use (it supports some advanced
+  Unicode things, such as transforms for normalization, accent removal, etc.).
+* To split files into pieces, see split (to split by size) and csplit (to split by a pattern).
+
+## System debugging
+
+* To know disk/cpu/network status, use iostat, netstat, top (or the better htop), and (especially)
+  dstat. Good for getting a quick idea of what's happening on a system.
+* To know memory status, run and understand the output of free. In particular, be aware the "cached"
+  value is memory held by the Linux kernel as file cache, so effectively counts toward the "free"
+  value.
+* Java system debugging is different kettle of fish, but a simple trick on Sun's and some other JVMs
+  is that you can run kill -3 <pid> and they will dump a full stack trace and heap summary
+  (including generational garbage collection details) to stderr/logs.
+* Use mtr as a better traceroute, to identify network issues.
+* To find which socket or process is using bandwidth, try iftop or nethogs.
+* The ab tool (comes with Apache) is helpful for quick-and-dirty checking of web server performance.
+* For more serious network debugging, wireshark or tshark.
+* Know strace, and that you can strace a running process (with -p). This can be helpful if a program
+  is failing, hanging, or crashing, and you don't know why.
+* Know about ldd to check shared libraries etc.
+* Know how to connect to a running process with gdb and get its stack traces.
+* Use /proc. It's amazingly helpful sometimes when debugging live problems. Examples: /proc/cpuinfo,
+  /proc/xxx/cwd, /proc/xxx/exe, /proc/xxx/fd/, /proc/xxx/smaps.
+* When debugging why something went wrong in the past, sar can be very helpful. It shows historic
+  statistics on CPU, memory, network, etc.
+* Use dmesg whenever something's acting really funny (it could be hardware or driver issues).
+
+# What are some lesser known but useful Unix commands?
+
+* m4: simple macro processor
+* yes: print a string a lot
+* seq: print numbers
+* cal: nice calendar
+* env: run a command (useful in scripts)
+* look: find English words (or lines in a file) beginning with a string
+* cut and paste and join: data manipulation
+* bc: calculator
+
+## Formatting
+
+* fmt: format text paragraphs
+* pr: format text into pages/columns
+* fold: wrap lines of text
+* column: format text into columns or tables
+* expand and unexpand: convert between tabs and spaces
+
+    find . -iname "*.cpp" ! -type d | xargs -Ixxx bash -c 'expand -t 4 xxx > ~/tmp/e && mv ~/tmp/e xxx'
+
+* nl: add line numbers
+
+## Networking
+
+* nc: network debugging and data transfer
+* mtr: better traceroute for network debugging
+* wireshark and tshark: packet capture and network debugging
+* host and dig: DNS lookups
+* lsof: process file descriptor and socket info
+* ab: benchrmarking web servers
+* ss: socket statistics
+
+## Filesystem
+* dd: moving data between files or devices
+* file: identify type of a file
+* ldd: dynamic library info
+* stat: file info
+* tac: print files in reverse
+* shuf: random selection of lines from a file
+* comm: compare sorted files line by line
+* hd and bvi: dump or edit binary files
+* strings: extract text from binary files
+* tr: character translation or manipulation
+* iconv or uconv: conversion for text encodings
+* split and csplit: splitting files
+* 7z: high-ratio file compression
+* nm: symbols from object files
+
+## Systeminfo
+
+* strace: system call debugging
+* cssh: visual concurrent shell
+* dstat: useful system stats
+* iostat: CPU and disk usage stats
+* htop: improved version of top
+* last: login history
+* w: who's logged on
+* id: user/group identity info
+* sar: historic system stats
+* iftop or nethogs: network utilization by socket or process
+* dmesg: boot and system error messages
+* (Linux) hdparm: SATA/ATA disk manipulation/performance
+* (Linux) lsb_release: Linux distribution info
+* (Linux) lshw: hardware information
+
+# man
+
+## find manpages for a specific topic
+
+    $ man -k xxx  -- will list all manpages that contain information about xxx
+
+# seq command
+
+    $ seq 5 -- prints numbers from 1 to 5
+    $ seq 5 10
+    $ seq 0 2 10
+    $ seq 5 -1 1
+
+# find
+
+### find all files that are executable
+
+    find <dir> -executable -type f
+
+### find all files with multiple patterns
+
+    find . -name "*.cpp" -or -name "*.h"
+
+### touch all files in directory recursively
+
+    find . -exec touch {} \;
+
+### copy multiple files (e.g. all files starting with 'one' into dir 'play')
+
+    find -name "one*" -exec cp "{}" play \;
+
+### using xargs
+
+    find -name "one*" -print0 | xargs -0 cp -t play
+
+### find all files that have a .xls or .csv extension?
+
+    find -name "*.xls" -o -name "*.csv"
+    find -regex ".*\.\(xls\|csv\)"
+
+### filter out stuff
+
+    find . -iregex '.*debug.*.o' | grep -v Bootloader
+
+# ack
+
+### search for all "assert(" strings in any cpp or h file
+
+    ack 'assert\(' -G '.*\.(cpp|h)'
+
+# for loops
+
+### loop over range (> bash version 3)
+
+    $ for i in {1..12}; do cal -m $i; done
+
+### Bash substitution
+
+    $ for i in *.flv; do echo original: "$i" , substituted: "${i/.flv/.mp3}"; done
+
+### do s.th. for each file
+
+    for n in `ls -d */`;do cd $n; echo "-------" `pwd`;ack.pl .*exe$; cd ..; done
+    for n in `cat  unittest.txt`;do echo "-------" $n; done
+
+### find all unit tests and execute those:
+
+    for n in `find . -name *exe | ack.pl -i unittest`;do $n; done
+
+### find out which files are executable:
+
+    for n in `find . -name *.a`;do if [ -x "$n" ]; then echo "$n yea"; else echo no$n;fi; done
+
+    alphabet="a b c d e"          # Initialise a string
+    count=0                 # Initialise a counter
+    for letter in $alphabet         # Set up a loop control
+    do                    # Begin the loop
+        count=`expr $count + 1`       # Increment the counter
+        echo "Letter $count is [$letter]" # Display the result
+    done                  # End of loop
+
+# script files
+
+### for a new script file:
+
+    touch myScript.sh
+
+### start with #!/bin/sh
+
+    echo "#!/bin/sh" >> myScript.sh
+
+# Job Control
+
+    $ [crtl]+z        # Stop (don't kill) the foreground job, and then return to the shell
+    $ bg              # Run the most recently stopped job in background
+    $ jobs            # Check the status of jobs in current session
+    $ ps -u username  # Check the status of processes, including those from other sessions (On BSD systems, use 'ps -gx')
+    $ fg              # Bring most recently backgrounded job to foreground
+    $ disown          # disown to avoid killing the process after you close the terminal
+
+# chown
+
+### recursively change the owner to ethanhunt and group to admin
+
+    $ sudo chown -R  ethanhunt:admin dev
+
+# chmod
+
+### make file executable
+
+    chmod 755 myScript.sh
+
+### change permissions recursively for directory
+
+    chmod -R 755 dirName
+
+## permission flags
+
+    drwxr-xr-x 3 ethanhunt user   2008 May 23 08:57 tmp
+     +--|  |    user
+        +--|    group
+           +--  other
+
+### add write permission for group to "myfile"
+
+    chmod g+w myfile
+
+# change routing for one ip:
+
+    $ sudo route del -net 169.254.0.0 netmask 255.255.0.0 dev eth2
+    $ sudo route add -net 169.254.0.0 netmask 255.255.0.0 dev eth0
+(will route on eth0)
+
+# change stati ip:
+
+    $ sudo ifconfig eth0 160.48.199.101 netmask 255.255.0.0 up
+
+# du usage
+
+    du -h --max-depth=1 // better: du -hd 1
+
+### Run the last command as root
+
+    sudo !!
+
+### Rapidly invoke an editor to write a long, complex, or tricky command
+
+    ctrl-x ctrl-e
+
+### Execute a command at a given time
+
+    echo "ls -l" | at midnight
+
+
+

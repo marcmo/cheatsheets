@@ -1,0 +1,19 @@
+# ack-grep usage
+
+## search for all "assert(" strings in any cpp or h file
+
+    ack 'assert\(' -G '.*\.(cpp|h)'
+
+
+## search all files ending in ".meta"
+
+    ack -a -G ".*\.meta$" xyz
+
+## list all files that contain a pattern
+
+    ack pattern -l
+
+## substitute in all files that contain a pattern
+
+    ack -a -G ".*\.meta$" Logger -l | xargs -Ixx sed -i "s/Logger/logger/g" xx
+

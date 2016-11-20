@@ -1,0 +1,8 @@
+
+## HEAD request
+
+    curl -I https://test.com
+
+## HEAD request WITH following redirects
+
+    curl -I -L https://test.com

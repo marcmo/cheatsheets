@@ -1,0 +1,125 @@
+# ssh-agent
+
+## only enter SSH passphrase once
+
+    $ ssh-agent bash
+
+This creates a new bash process that allows you to add private keys. When adding a new private key
+you will be prompted for the passphrase once and only once.
+And then:
+
+    $ ssh-add /home/username/.ssh/id_rsa
+    Enter passphrase for /home/username/.ssh/id_rsa:
+    Identity added: /home/username/.ssh/id_rsa (/home/username/.ssh/id_rsa)
+
+# scp
+
+### Copy the file "foobar.txt" from a remote host to the local host
+
+    $ scp your_username@remotehost.edu:foobar.txt /some/local/directory
+
+## ssh-add
+
+### secure copy, e.g. copy ssh keys
+
+using identity ethanhunt.pub
+
+    scp -i /home/myuser/.ssh/ethanhunt.pub /home/myuser/.ssh/id_rsa.pub   linux2@10.40.39.53:tmp/id_rsa.pub
+
+### list all keys for ssh-add
+
+    $ ssh-add -l
+
+### add ssh key so not only id_rsa etc. is tried:
+
+    $ ssh-add path/to/key
+
+### You may also need to update the permissions on your .ssh folder and its contents (see Troubleshooting)
+
+# SSH
+
+## Log in
+
+    $ ssh username@host
+
+## Login with non-standard port (other than 22)
+
+    $ ssh -p 42053 username@host
+
+## debugging ssh connection problems
+
+Run the ssh client in verbose mode
+
+    $ ssh -vvv user@host
+
+On the server, check auth.log for errors
+
+    $ sudo tail -f /var/log/auth.log
+
+For more debugging info, run the sshd server in debug mode on another port
+
+    $ sudo /usr/sbin/sshd -ddd -p 33333
+
+Then specify the port, -p 33333 with the ssh client. e.g.
+
+    $ ssh -vvv -p 33333 user@host
+
+## SSH keys
+
+### generate new key
+
+    $ ssh-keygen -t rsa -C "ethanhunt@testkey"
+
+### re-generate public key from private key
+
+    $ ssh-keygen -y -f private.key
+
+### generate fingerprint for ssh key
+
+    $ ssh-keygen -lf ~/.ssh/id_rsa.pub
+
+### To change RSA passphrase, enter:
+
+    $ ssh-keygen -f id_rsa -p
+
+### extract public key from private key file:
+
+    ssh-keygen -y -f  myid.key > id_rsa.pub
+
+### convert gpg to ssh format
+
+    ssh-keygen -i -f lanxadmin.key > lanxadmin.pub
+
+### distribute/deploy key to server
+
+    $ cat ~/.ssh/id_rsa.pub | ssh user@host "cat >> ~/.ssh/authorized_keys"
+
+everything in one call (also creating the .ssh folder)
+
+    $ cat ~/.ssh/mykey.pub | ssh me@server "mkdir ~/.ssh && chmod 700 .ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+
+### secure copy, e.g. copy ssh keys:
+
+    scp -i /home/myuser/.ssh/ethanhunt.pub /home/myuser/.ssh/id_rsa.pub   linux2@10.40.39.53:tmp/id_rsa.pub
+
+
+## Troubleshooting SSH access
+
+First, the .ssh directory should have 700 permissions and the authorized_keys file should have 600.
+
+    chmod 700 .ssh
+    chmod 600 .ssh/authorized_keys
+
+In case you created the files with say root for userB then also do:
+
+    chown -R userb:userb .ssh
+
+## check server SSH logs
+
+    sudo tail -10 /var/log/auth.log
+
+## Use rsync over ssh
+
+    $ rsync -avz -e ssh /src/dir user@remote.host:dst/dir
+
+

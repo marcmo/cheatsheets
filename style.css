@@ -1,0 +1,89 @@
+body {
+  font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+}
+
+a:link {color:#F55B2C;}
+a:link, a:visited {
+    color:#F55B2C;
+}
+
+div.slide h1 {
+  background-color: #464850;
+  color: #C2C3C4;
+  padding: 0.5em 1em;
+}
+div.slide h1, div.slide.titlepage h1 {
+  margin-right: -20px;
+  margin-left: -20px;
+}
+h1 code {
+  color: #cbe3ff;
+  font-weight: bold;
+}
+
+code {
+  font-weight: normal;
+  color: #00428C;
+}
+
+li p {
+  margin-left: 0;
+}
+
+div.slide > p:first-child {
+  margin-top: 5em;
+  text-align: center;
+  color: #009091;
+  font-size: 150%;
+}
+
+h1 + pre.sourceCode {
+  margin-top: 3em;
+}
+
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre 
+   { margin: 0; padding: 0; border: 0; vertical-align: baseline; border: none; }
+td.lineNumbers { border-right: 1px solid #AAAAAA; text-align: right; color: #AAAAAA; padding-right: 5px; padding-left: 5px; }
+td.sourceCode { padding-left: 5px; }
+
+/* pre { */
+/*   background: #fffee5; */
+/*   border: 1px solid #d8d7c2; */
+/*   padding: 0.5em 1.5em; */
+/*   font-weight: normal; */
+/*   font-style: normal; */
+/* } */
+pre {
+    border: 0 none;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: -1px -1px rgba(34, 34, 34, 0.1);
+    color: #1D1D1D;
+    font-family: monospace;
+    margin: 10px;
+    overflow-x: auto;
+    padding: 0.5em 1.5em;
+    vertical-align: baseline;
+    word-wrap: normal;
+}
+pre.terminal {
+    background: none repeat scroll 0 0 #2B2B2B;
+    box-shadow: -1px -1px #FFFFFF;
+    color: #B7B7B7;
+    font-weight: normal;
+    text-shadow: none;
+}
+
+
+code.sourceCode span.kw { color: #007020; font-weight: bold; } 
+code.sourceCode span.dt { color: #902000; }
+code.sourceCode span.dv { color: #40a070; }
+code.sourceCode span.bn { color: #40a070; }
+code.sourceCode span.fl { color: #40a070; }
+code.sourceCode span.ch { color: #4070a0; }
+code.sourceCode span.st { color: #4070a0; }
+code.sourceCode span.co { color: #60a0b0; font-style: italic; }
+xcode.sourceCode span.ot { color: #007020; }
+code.sourceCode span.al { color: red; font-weight: bold; }
+code.sourceCode span.fu { color: #06287e; }
+code.sourceCode span.re { }
+code.sourceCode span.er { color: red; font-weight: bold; }

@@ -1,0 +1,16 @@
+
+# setup new wine bottle
+
+    $ mkdir mybottle
+    $ export WINEPREFIX=`pwd`/mybottle
+
+# execute exe
+
+    $ wine /path/to/exe/text.exe
+
+# Winetricks
+
+## getting Winetricks
+
+    wget  https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+    chmod +x winetricks 

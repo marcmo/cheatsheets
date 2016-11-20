@@ -1,0 +1,86 @@
+## List All Available Packages
+
+    $ apt-cache pkgnames
+
+## List all installed packages
+
+    $ dpkg -l
+
+## To get a list of packages installed locally
+
+    $ dpkg --get-selections | grep -v deinstall
+
+## search for a package
+
+    $ apt-cache search foo
+
+e.g. Find out all the packages which can be used for Intrusion Detection
+
+    $ apt-cache search "Intrusion Detection"
+
+## Check Package Information
+
+    $ apt-cache show netcat
+
+## Update System Packages
+
+The ‘update‘ command is used to resynchronize the package index files from the their sources
+specified in /etc/apt/sources.list file
+
+    $ sudo apt-get update
+
+## Upgrade Software Packages
+
+    $ sudo apt-get upgrade
+
+## Check Dependencies for Specific Package
+
+    $ apt-cache showpkg vsftpd
+
+## List ach dependency a package has...
+
+    $ apt-cache depends package
+
+## Install Specific Package Version
+
+simply use the ‘=‘ with the package-name and append desired version
+
+    $ sudo apt-get install vsftpd=2.3.5-3ubuntu1
+
+## Remove Packages Without Configuration
+
+for later re-use the same configuration
+
+    $ sudo apt-get remove vsftpd
+
+## Completely Remove Packages
+
+    $ sudo apt-get purge vsftpd
+
+## combine both the commands together as shown below.
+
+    $ sudo apt-get remove --purge vsftpd
+
+## Clean Up Disk Space
+
+The ‘clean‘ command is used to free up the disk space by cleaning retrieved (downloaded) .deb files
+(packages) from the local repository.
+
+    $ sudo apt-get clean
+
+## Check Broken Dependencies
+
+The ‘check‘ command is a diagnostic tool. It used to update package cache and checks for broken
+dependencies.
+
+    $ sudo apt-get check
+
+## Search and Build Dependencies?
+
+This ‘build-dep‘ command searches the local repositories in the system and install the build
+dependencies for package. If the package does not exists in the local repository it will return an
+error code.
+
+    $ sudo apt-get build-dep netcat
+
+

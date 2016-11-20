@@ -1,0 +1,12 @@
+## Upgrading Node.js to latest version
+
+The module n makes version-management easy:
+
+    sudo npm install n -g
+    sudo n 0.4.12
+
+For the latest version:
+
+    sudo n stable
+
+

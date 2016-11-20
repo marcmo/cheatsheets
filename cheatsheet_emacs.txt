@@ -1,0 +1,123 @@
+Word completion		M-/
+enter minibuffer 	M-x
+Quite command 		C-g
+comment-region		C-c C-c
+uncomment-region	C-c C-u
+goto line:				M-g g
+Shell:						M-x shell
+kill-line-backwards M-0 C-k
+
+--Creating and Selecting Buffer--
+C-x b buffer RET    		 Select or create a buffer named buffer (switch-to-buffer). 
+C-x 4 b buffer RET    	 Similar, but select buffer in another window (switch-to-buffer-other-window). 
+C-x 5 b buffer RET    	 Similar, but select buffer in a separate frame (switch-to-buffer-other-frame). 
+
+--Killing Buffers--
+C-x k bufname RET				Kill buffer bufname (kill-buffer). 
+M-x kill-some-buffers  	Offer to kill each buffer, one by one. 
+
+--Marks--
+Cx-Cx		to swap point (cursor) and mark
+				When you... the mark is set to...
+				C-spc						(where you are)				
+				M< or M>				(where you were)
+				Search for text	(where you started)
+				Yank text	 			(start of inserted text)
+				Insert a buffer	(start of inserted text)
+				Move to a previous mark: C-u C-SPC
+Select all: C-x h
+
+--Search&Replace--
+M-x query-replace = incrementally replace
+C-s    Incremental search forward (isearch-forward). 
+		C-s again to find next occurrence
+		C-g to cancel and go back to start of search
+		C-s C-s		Search for previously searched string
+		C-s then M-p,M-n		Browse and edit previous queries
+C-r    Incremental search backward (isearch-backward).
+M-x 	 replace-regexp
+		example:
+		Bill Gates			->			GATES, Bill
+		Steve Jobs			->			JOBS, Steve
+		M-x replace-regexp \(\w+\) \(\w+\) with \,(upcase \2), \1
+		stick in a newline: C-q C-j
+		
+--Macros--
+C-x (		Start recording macro
+C-x )		Stop recording macro
+C-x e		Replay macro
+
+--Multiple Windows--
+C-x 1			delete all other windows
+C-x 0			delete this window
+C-x 2			split this window in half vertically
+C-x 5			split this window in half horizontally
+C-M-v			scroll other window
+C-x o			switch cursor to another window
+
+--Spelling Check--
+M-$			check spelling of current word
+M-x ispell-region	check spelling of marked region
+M-x ispell-buffer	check spelling of entire buffer
+
+--What did I just do?--
+M-x 	 view-lossage				
+
+DIRectory EDitor (dired)
+C-x d start up dired
+C (large C) copy
+d mark for erase
+D delete right away
+e or f open file or directory
+g reread directory structure from file
+G change group permissions (chgrp)
+k delete line from listing on screen (don't actually delete)
+m mark with *
+n move to next line
+o open file in other window and go there
+C-o open file in other window but don't change there
+P print file
+q quit dired
+Q do query-replace in marked files
+R rename file
+u remove mark
+v view file content
+x delete files marked with D
+z compress file
+M-Del remove all marks (whatever kind)
+~ mark backup files (name~ files) for deletion
+# mark auto-save files (#name#) for deletion
+*/ mark directory with * (C-u * removes that mark again)
+= compare this file with marked file
+M-= compare this file with it's backup file
+! apply shell command to this file
+M-} change to the next file marked with * od D
+M-{ " previous "
+% d mark files described through regular expression for deletion
+% m " (with *)
++ create directory
+> changed to next dir
+< change to previous dir
+s toggle between sorting by name or date
+
+--define key-binding--
+An easier way to figure out the key you need to specify for global/local-set-key is to use the kbd macro.
+C-h c M-space –> M-SPC runs the command just-one-space
+then simply use the key that it told you and wrap it with kbd.
+(global-set-key (kbd "M-SPC") 'my-func)
+
+Handy keybindings in haskell-mode. See the documentation C-h m for more information:
+
+    * C-c C-= inserts an = sign and lines up type signatures and other pattern matches nicely.
+    * C-c C-| inserts a guard
+    * C-c C-o inserts a guard | otherwise = and lines up existing guards
+    * C-c C-w inserts a where keyword
+    * C-c C-. aligns code over a region in a "sensible" fashion. 
+
+Now in version 2.2:
+
+    * C-c C-t gets :type for symbol at point, and remembers it
+    * C-u C-c C-t inserts a type annotation, for symbol at point, on the line above
+    * C-c C-i gets :info for symbol at point
+    * C-c M-. find definition of (interpreted) symbol at point 
+								

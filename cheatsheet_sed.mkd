@@ -1,0 +1,80 @@
+# sed usage
+
+## osx/BSD sed
+
+If you use the -i option you need to provide an extension for your backups.
+
+    sed -i '.original' 's/old_link/new_link/g' *
+
+You can use
+
+    sed -i '' 's/old_link/new_link/g' *
+
+to ignore backups.
+
+## regex in sed
+
+* [a-zA-Z] for word character
+* [0-9] for digit
+* \(xyz\) for group and \1 for refering to group
+
+### example: copy all Project.meta files into same directory structure
+
+    for i in `find . -iname "Project.meta"`;
+      do echo $i | sed 's/\(.*\)\/Project\.meta/cp \1\/Project.meta ~\/work\/\1/' | sh;
+    done
+
+
+## delete lines from file
+
+    sed -i".bak" '/CommandLine \"/d' test.txt
+
+### together with ag/ack
+
+BSD/MacOSx:
+
+    ag -a -l -G ".*\.(h|cpp)" "foo" | xargs -n1 sed -i"" 's/foo/bar/g'
+
+linux:
+
+    ag -a -l -G ".*\.(h|cpp)" "foo" | xargs -n1 sed      's/foo/bar/g'
+
+
+## search/replace in multiple files
+
+    find . -name "*.c" -exec sed -i "s/oldWord/newWord/g" '{}' \;
+
+
+## So, if you wanted to rename all the .php3 to .php, this would be the command:
+
+    ls -d *.php3 | sed 's/\(.*\).php3$/mv "&" "\1.php"/' | sh
+
+## match alternatives
+
+    sed 's/\(foo\|bar\)/__\1__/'
+
+## filter diff output of projet-set files
+
+    git diff 6967a77f96c2a30f48 fem_integration_main/fem_projectSet.psf | sed 's/<project.*trunk\/\(.*\)c0dc.*\|<project.*trunk\/\(.*\)90f8.*/---\1+++\2/'
+
+## Renaming
+
+So, if you wanted to rename all the .php3 to .php, this would be the command:
+
+    ls -d *.php3 | sed 's/\(.*\).php3$/mv "&" "\1.php"/' | sh
+
+so what does this do?
+
+- ls -d *.php3 outputs a list of all the php3 files in the directory. This list is piped to the second command,
+- sed '/\(.*\).php3$/mv "&" "\1.php"/' the stream is the list of files. the argument passed to sed 's/\(.*\).html$/mv "&" "\1.php"/' is what should be edited:
+
+    * s tells sed to replace a string by another,
+    * (.*\).php3$ is a regular expression to tell that the string we will want to replace is anyname.php3,
+    * mv "&" "\1.php" is the replacement string. the \1 is there to take the name of the file in the first string and put it there.
+    * & refers to the portion of the pattern space which matched,
+
+- | sh takes the output of sed and executes it (sh is the shell interpreter). hence executing the list of mv anyname.php3 anyname.php.
+
+other example:
+
+    ls | sed 's/\(.*\)\..*$/mv "&" "\1.log"/' | sh

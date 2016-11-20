@@ -1,0 +1,65 @@
+## checkout new repository
+
+## Add Local Folder to Repository
+
+    $ svn import folder "/path/to/repository"
+
+## Checkout Working Copy
+
+    $ svn checkout "/path" foldername
+
+## Update Working Copy from Repository
+
+    $ svn update "/path"
+
+## Update to revision 9
+
+    $ svn update -r9 "/path"
+
+## Commit Changes to Repository
+
+    $ svn commit -m "Message" "/path"
+
+## delete from svn
+
+    $ svn delete "/path"
+
+## Copy source to target
+
+    $ svn copy "sourcepath" "targetpath"
+
+## Move source to target
+
+    $ svn move "sourcepath" "targetpath"
+
+## get svn remote respository url
+
+    $ svn info .
+
+## Revert Local (Uncommitted) Changes
+
+    $ svn revert "/path/filename"
+
+## Reverts changes to folder recursively
+
+    $ svn revert -R "/path/folder"
+
+## Argument Shortcuts
+
+    -m "Message" --message
+    -q           --quiet
+    -v           --verbose
+    -r           --revision
+    -c           --change
+    -t           --transaction
+    -R           --recursive
+    -N           --non-recursive
+
+
+
+
+
+
+
+
+

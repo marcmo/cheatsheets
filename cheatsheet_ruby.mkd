@@ -1,0 +1,358 @@
+## generate Unix timestamps
+
+    Time.now.to_i
+    => 1248933648
+
+## switch case
+
+    case a
+    when 1..5
+      puts "It's between 1 and 5"
+    when 6
+      puts "It's 6"
+    when String
+      puts "You passed a string"
+    else
+      puts "You gave me #{a} -- I have no idea what to do with that."
+    end
+
+## asserts the ruby way
+
+    raise "not what I want" if foo.nil?
+
+## check if symlink exists
+
+    def file_dir_or_symlink_exists?(path_to_file)
+      File.exist?(path_to_file) || File.symlink?(path_to_file)
+    end
+
+    file_dir_or_symlink_exists?(bashrc)                            # => true
+    file_dir_or_symlink_exists?('/Users')                          # => true
+    file_dir_or_symlink_exists?('/usr/bin/ruby')                   # => true
+    file_dir_or_symlink_exists?('some/bogus/path/to/a/black/hole') # => false
+
+# Appending and Prepending to an Array
+
+    array = [1, 2, 3]
+    array << 4 #=> [1, 2, 3, 4]
+
+    array.unshift 0 #=> [0, 1, 2, 3, 4]
+
+# inject
+
+    [1,"a",Object.new,:hi].inject({}) do |hash, item|
+      hash[item.to_s] = item
+      hash
+    end
+
+# Command Line Arguments
+
+    #!/usr/bin/env ruby
+
+    ARGV.each do|a|
+      puts "Argument: #{a}"
+    end
+
+# exceptions
+
+## begin/rescue/ensure
+
+java equivalent of try catch finally:
+ensure goes after the last rescue clause and contains a chunk of code that will always be executed as the block terminates.
+It doesn't matter if the block exits normally, if it raises and rescues an exception, or if it is terminated by an uncaught exception
+the ensure block will get run.
+
+    f = File.open("testfile")
+    begin
+      # .. process
+    rescue Exception => e
+      # .. handle error
+    ensure
+      f.close unless f.nil?
+    end
+
+## Exception kinds
+
+Exception is the root of Ruby's exception hierarchy
+when you rescue Exception you rescue from everything, including subclasses such as SyntaxError, LoadError, and Interrupt.
+
+* Rescuing Interrupt prevents the user from using CTRLC to exit the program.
+* Rescuing SignalException prevents the program from responding correctly to signals. It will be unkillable except by kill -9.
+* Rescuing SyntaxError means that evals that fail will do so silently.
+
+# Strings
+
+## remove trailing newlines
+
+Returns a copy of str with leading and trailing whitespace removed.
+
+    "    hello    ".strip   #=> "hello"
+    "\tgoodbye\r\n".strip   #=> "goodbye"
+
+# regular expressions (regex)
+
+### "Escaped" characters or metacharacters
+
+    /./  - Any character except a newline.
+    /./m - Any character (the m modifier enables multiline mode)
+    /\w/ - A word character ([a-zA-Z0-9_])
+    /\W/ - A non-word character ([^a-zA-Z0-9_]). Please take a look at Bug #4044 if using /\W/ with the /i modifier.
+    /\d/ - A digit character ([0-9])
+    /\D/ - A non-digit character ([^0-9])
+    /\h/ - A hexdigit character ([0-9a-fA-F])
+    /\H/ - A non-hexdigit character ([^0-9a-fA-F])
+    /\s/ - A whitespace character: /[ \t\r\n\f]/
+    /\S/ - A non-whitespace character: /[^ \t\r\n\f]/
+
+### matching
+
+from `http://www.ralfebert.de/blog/ruby/regex_cheat_sheet/`
+
+String.=~(Regexp) returns the starting position of the first match or nil if no match was found
+
+    >> "123 456 789" =~ /\d+/
+    => 0
+
+    >> "abc def ghi" =~ /\d+/
+    => nil
+
+    >> "found" if "123 456 789" =~ /\d+/
+    => "found"
+
+Special $ variables will contain information about the last match:
+
+    >> "123 456 789" =~ /\d\d\d/
+    => 0
+
+    # $` contains text before last match
+    # $& contains last matched string
+    # $' contains text after last match
+    >> $` + '[' + $& + ']' + $'
+    => "[123] 456 789"
+
+## group matching
+
+    if match = string.match(/(^.*)(:)(.*)/i)
+      one, two, three = match.captures
+    end
+
+## search and replace
+
+    phone = "2004-959-559 #This is Phone Number"
+    # Delete Ruby-style comments
+    phone = phone.sub!(/#.*$/, "")
+
+### groups
+
+    phone = phone.sub!(/name\s(.*)#.*$/, "\\1 ")
+
+# File stuff
+
+## sort files by timestamp
+
+### If you want 'modified time', oldest first
+
+    files_sorted_by_time = Dir['*'].sort_by{ |f| File.mtime(f) }
+
+### If you want 'directory change time' (creation time for Windows)
+
+    files_sorted_by_time = Dir['*'].sort_by{ |f| File.ctime(f) }
+
+where your options are:
+
+r - Read only. The file must exist.
+w - Create an empty file for writing.
+a - Append to a file.The file is created if it does not exist.
+r+ - Open a file for update both reading and writing. The file must exist.
+w+ - Create an empty file for both reading and writing.
+a+ - Open a file for reading and appending. The file is created if it does not exist.
+
+## open and close file automatically after last line read
+
+    File.open("my/file/path", "r").each_line do |line|
+      puts line
+    end
+## write to file
+
+    File.open(yourfile, 'w') { |file| file.write("your text") }
+
+# Date stuff
+
+    t = Time.now
+    t.strftime("Printed on %m/%d/%Y")   #=> "Printed on 04/09/2003"
+    t.strftime("at %I:%M%p"
+
+
+# irb
+
+## start IRB with current dir in path
+
+    irb -I .
+
+## add do loadpath
+
+    $:.unshift File.join(File.dirname(__FILE__),"..","..","lib")
+
+## List all subdirectories
+
+    Dir.glob("*/")
+
+# ruby gems
+
+## avoid docs when installing gems
+
+### add following line to your ~/.gemrc file (it is in your home folder)
+
+    gem: --no-ri --no-rdoc
+
+## installing gems:
+
+    gem install sass [--source http://rubygems.org]
+
+## uninstall:
+
+    sudo gem uninstall rake -i /usr/local/lib/ruby
+
+## install certain version
+
+    gem install cxx -v 0.1.15
+
+## update ruby gems
+
+    gem install rubygems-update
+    update_rubygems
+    gem update --system
+
+# yaml files
+
+## sample yaml file: test.yml
+
+compiler: gcc
+
+## load yaml file
+
+    require 'yaml'
+    yml = YAML::load(File.open('compiler_config.yml'))
+    puts yml['compiler']
+
+# procs / lambdas
+
+    p = Proc.new { return "return from foo from inside proc" }
+    l = lambda { return "return from lambda" }
+
+    p.call # prints "return from foo from inside proc"
+    l.call # prints "return from bar"
+
+# check if a program exists
+
+    #   which('ruby') #=> /usr/bin/ruby
+    def which(cmd)
+      exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+      ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+        exts.each { |ext|
+          exe = "#{path}/#{cmd}#{ext}"
+          return exe if File.executable? exe
+        }
+      end
+      return nil
+    end
+
+# find out os
+
+    module OS
+      def OS.windows?
+        (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+      end
+
+      def OS.mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
+      end
+
+      def OS.unix?
+        !OS.windows?
+      end
+
+      def OS.linux?
+        OS.unix? and not OS.mac?
+      end
+    end
+
+## benchmarking
+
+
+    require 'benchmark'
+
+    task :prof => [:clean,ProfilingExecutable] do
+      benchmark = Benchmark.realtime do
+        ... do s.th. ...
+      end
+      puts "computing step took: " + sprintf("%.2f", benchmark)
+    end
+
+
+# Execute External Commands
+
+## run bash scripts
+
+    sh "bash -c '. envsetup.sh'"
+
+# Ways to execute a shell script in Ruby
+
+## Example Script - Joseph Pecoraro
+
+    cmd = "echo 'hi'" # Sample string that can be used
+
+## 1. Kernel#` - commonly called backticks - `cmd`
+
+This is like many other languages, including bash, PHP, and Perl
+
+__Returns:__ the result of the shell command
+__Docs:__ http://ruby-doc.org/core/classes/Kernel.html#M001111
+
+    value = `echo 'hi'` # or uglier but valid => Kernel.`("echo 'hi'")
+    value = `#{cmd}`    # or uglier but valid => Kernel.`("#{cmd}")
+
+## 2. Built-in syntax, %x( cmd )
+
+Following the ``x'' character is a delimiter, which can be any character.
+If the delimiter is one of the characters ``('', ``['', ``{'', or ``<'',
+the literal consists of the characters up to the matching closing delimiter,
+taking account of nested delimiter pairs. For all other delimiters, the
+literal comprises the characters up to the next occurrence of the
+delimiter character.  String interpolation #{ ... } is allowed.
+Returns the result of the shell command, just like the backticks
+Docs: http://www.ruby-doc.org/docs/ProgrammingRuby/html/language.html
+
+    value = %x( echo 'hi' )
+    value = %x[ #{cmd} ]
+
+## 3. Kernel#system
+
+Executes the given command in a subshell
+
+__Return:__ true if the command was found and ran successfully, false otherwise
+__Docs:__ http://ruby-doc.org/core/classes/Kernel.html#M002992
+
+    wasGood = system( "echo 'hi'" )
+    wasGood = system( cmd )
+
+## 4. Kernel#exec
+
+replaces the current process by running the given external command.
+
+__Return:__ none, the current process is replaced and never continues
+__Docs:__ http://ruby-doc.org/core/classes/Kernel.html#M002992
+
+    exec( "echo 'hi'" )
+    exec( cmd ) # Note: this will never be reached beacuse of the line above
+
+
+## Extra Advice
+
+`$?` which is the same as `$CHILD_STATUS`
+Accesses the status of the last system executed command if
+you use the backticks, system() or %x{}.
+You can then access the ``exitstatus'' and ``pid'' properties
+
+    $?.exitstatus
+

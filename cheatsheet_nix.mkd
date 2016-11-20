@@ -1,0 +1,138 @@
+
+## nix-env
+
+    -i == --install
+    -q == --query
+        -a == --available
+        -P == --attr-path
+
+### Search packages
+
+    $ nix-env -qaP | grep python3-3
+    nixpkgs.python32                               python3-3.2.5
+    nixpkgs.python33                               python3-3.3.3
+    nixpkgs.python3                                python3-3.3.3
+
+### Search frees packages in the stable repository
+
+go to http://nixos.org/nixos/packages.html
+
+### list all installed packages
+
+    $ nix-env -q
+
+### compare installed versions to what's available
+
+    $ nix-env -qc '*'
+    ...
+    acrobat-reader-7.0 - ?      (package is not available at all)
+    autoconf-2.59      = 2.59   (same version)
+    firefox-1.0.4      < 1.0.7  (a more recent version is available)
+
+### show status of available ghc derivations
+
+    $ nix-env -qas '*' | grep ghc
+
+    -P- abc   (not Installed but Present)
+    IP- abc   (Installed and Present)
+    --S abc   (there is a Substitute for fast installation)
+
+### Installing packages
+
+    nix-env {--install | -i}
+      [{--prebuilt-only | -b}]
+      [{--attr | -A}]
+      [--from-expression]
+      [-E]
+      [--from-profile path]
+      [--preserve-installed | -P]
+      [--remove-all | -r] args...
+
+**install an arbitrary version:**
+
+    $ nix-env --install gcc
+    installing `gcc-3.3.2'
+
+**referenced by name**
+
+    $ nix-env -i python3-3.3.3
+
+**or referenced with Attribute set value**
+
+    $ nix-env -iA nixpkgs.python3
+
+### dry-run tells you which paths will be downloaded or built from source
+
+    $ nix-env -f pkgs/top-level/all-packages.nix -i f-spot --dry-run
+    (dry run; not doing anything)
+    installing `f-spot-0.0.10'
+    the following derivations will be built:
+      /nix/store/0g63jv9aagwbgci4nnzs2dkxqz84kdja-libgnomeprintui-2.12.1.tar.bz2.drv
+      ...
+    the following paths will be substituted:
+      /nix/store/b8a2bg7gnyvvvjjibp4axg9x1hzkw36c-mono-1.1.4
+      ...
+
+### Upgrade package
+
+    $ nix-env --upgrade gcc # alternative -u
+    upgrading `gcc-3.3.1' to `gcc-3.4'
+
+### Upgrade everythin
+
+    $ nix-env -u '*'
+
+### Uninstalling packages (--uninstall or -e)
+
+    $ nix-env -e python3-3.3.3
+
+or
+
+    $ nix-env --uninstall firefox
+
+### Clean up uninstalled packages
+
+the package isn’t deleted from the system right away (after all, you might want to do a rollback, or
+it might be in the profiles of other users). Instead, unused packages can be deleted safely by
+running the garbage collector:
+
+    $ nix-collect-garbage
+
+## Manage generations
+
+### List installed generations
+
+    $ nix-env --list-generations
+
+### delete generations
+
+    $ nix-env --delete-generations 3 4 8
+
+### switch generation (-G or --switch-generation)
+
+    $ nix-env -G 42
+    switching from generation 50 to 42
+
+    $ nix-env --rollback
+    switching from generation 92 to 91
+
+## nix-channel
+
+### register a channel
+
+    $ nix-channel --add http://nixos.org/channels/nixpkgs-unstable
+
+### update binary channel
+
+    $ nix-channel --update
+
+## nix-store
+
+### remove from store
+
+    $ nix-store --delete /nix/store/a74a107pqin0gzb4v6mkbkrmh2bnpkj1-ncurses-5.9
+
+### why is it still alive?
+
+    $ nix-store -q --roots /nix/store/a74a107pqin0gzb4v6mkbkrmh2bnpkj1-ncurses-5.9
+

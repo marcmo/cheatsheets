@@ -1,0 +1,23 @@
+# Abbreviations
+
+* `$@` => target
+
+#  Recursive Wildcard Function
+
+from http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
+
+    rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)
+      $(filter $(subst *,%,$2),$d))
+
+Usage is as follows. First, all C files in the current directory (or below).
+
+    $(call rwildcard,,*.c)
+
+Then all C files in /tmp:
+
+    $(call rwildcard,/tmp/,*.c)
+
+Multiple patterns can be used. Here are all C and H files:
+
+    $(call rwildcard,/tmp/,*.c *.h)
+

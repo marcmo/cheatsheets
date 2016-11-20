@@ -1,0 +1,663 @@
+
+* * *
+
+#  [1. How do I use gdb?](#use)
+
+When you compile your program, you must tell the compiler to produce a program
+that is compatible with the debugger. The debugger needs special information
+to run properly. To do this, you must compile your program with the debugger
+flag, -g. This step is critical. Without it, the debugger won't have the
+program symbol information. That means it won't know what your functions and
+variables are called, and it won't understand when you ask it about them.
+
+##  How do I...?
+
+* 1.1. compile with debugging symbols?
+* 1.2. run programs with the debugger?
+* 1.3. restart a program running in the debugger?
+* 1.4. exit the debugger?
+* 1.5. get help on debugger commands?
+
+* * *
+
+#  [2. How do I watch the execution of my program?](#execution)
+
+Gdb functions somewhat like an interpreter for your programs. You can stop
+your program at any time by sending it signals. Normally this is done using
+key combinations like Ctrl-C for the interrupt signal SIGINT. Outside of gdb
+this would terminate your program. Gdb traps this signal and stops executing
+your program. Also, using breakpoints you can have your program stop executing
+at any line of code or function call. Once your program is stopped, you can
+examine 'where' it is in your code. You can look at the variables currently in
+scope, as well as your memory space and the cpu registers. You can also change
+variables and memory to see what effect it has on your code.
+
+##  How do I...?
+
+* 2.1. [stop execution](#step1)
+* 2.2. [continue execution](#step2)
+* 2.3. [see where my program stopped?](#step3)
+* 2.4. [step through my code line-by-line?](#step4)
+* 2.5. [examine variables?](#step5)
+* 2.6. [modify variables?](#step6)
+* 2.7. [call functions linked into my program?](#step7)
+* 2.8. [return from a function?](#step8)
+
+* * *
+
+3. How do I use the call stack?
+===============================
+
+The call stack is where we find the stack frames that control program
+flow. When a function is called, it creates a stack frame that tells the
+computer how to return control to its caller after it has finished
+executing. Stack frames are also where local variables and function
+arguments are 'stored'. We can look at these stack frames to determine
+how our program is running. Finding the list of stack frames below the
+current frame is called a backtrace.
+
+How do I ...?
+-------------
+
+1.  [get a backtrace?](#BACKTRACE)
+2.  [change stack frames?](#CHFRAME)
+3.  [examine stack frames?](#EXAMINE)
+
+* * * * *
+
+
+#  4. How do I use breakpoints?
+
+Breakpoints are a way of telling gdb that you want it to stop your program at
+certain lines of code. You can also have it stop when your program makes
+specific function calls. Once the program is stopped, you can poke around in
+memory and see what the values of all your variables are, examine the stack,
+and step through your program's execution.
+
+## How do I ...?
+
+* 4.1. [set a breakpoint on a line?](#setb)
+* 4.2. [set a breakpoint on a C function?](#setc)
+* 4.3. [set a breakpoint on a C++ function?](#setd)
+* 4.4. [set a temporary breakpoint?](#sete)
+* 4.5. [get a list of breakpoints?](#setf)
+* 4.6. [disable breakpoints?](#setg)
+* 4.7. [skip breakpoints?](#seth)
+
+* * * * *
+
+5. How do I use watchpoints?
+============================
+
+Watchpoints are similar to breakpoints. However, watchpoints are not set
+for functions or lines of code. Watchpoints are set on variables. When
+those variables are read or written, the watchpoint is triggered and
+program execution stops.
+
+It is difficult to understand watchpoint commands by themselves, so the
+following simple example program will be used in the command usage
+examples.
+
+> ``
+>
+>     #include <stdio.h>
+>
+>     int main(int argc, char **argv)
+>     {
+>       int x = 30;
+>       int y = 10;
+>
+>       x = y;
+>
+>       return 0;
+>     }
+
+How do I...?
+------------
+
+1.  [set a write watchpoint for a variable?](#WRITE)
+2.  [set a read watchpoint for a variable?](#READ)
+3.  [set a read/write watchpoint for a variable?](#RDWR)
+4.  [disable watchpoints?](#DISABLE)
+
+* * * * *
+
+6. Advanced gdb Features
+========================
+
+1.  [How do I examine memory?](#MEMORY)
+2.  [How do I see what is in the processor registers?](#REGISTERS)
+3.  [How do I debug with a core file?](#CORE)
+4.  [How do I step through my code at the instruction level?](#STEPI)
+5.  [How do I see the assembly code my program is running?](#DISASS)
+
+* * *
+
+#  1. How do I use gdb?
+<a name="use"></a>
+
+### 1.1 How do I compile with debugging symbols? [top]
+
+Pass the **-g** flag to your compiler:
+
+    $ gcc -g program.c -o programname
+
+NOTE: If you have a larger program with several files, each must be compiled
+with the -g flag, and it must also be set when you link.
+
+
+### 1.2 How do I run programs with the debugger? [top]
+
+First start the debugger with your program name as the first argument.
+
+    $ gdb programname
+
+Next use the **run** command in gdb to start execution. Pass your arguments to
+this command.
+
+    (gdb) run arg1 "arg2" ...
+
+
+### 1.3 How do I restart a program running in the debugger? [top]
+
+Use the **kill** command in gdb to stop execution. The you can use the run
+command as shown above to start it again.
+
+    (gdb) kill
+    Kill the program being debugged? (y or n) y
+    (gdb) run ...
+
+
+### 1.4 How do I exit the debugger? [top]
+
+Use the **quit** command.
+
+    (gdb) quit
+
+NOTE: You may be asked if you want to kill the program. Answer yes.
+
+    (gdb) quit
+    The program is running. Exit anyway? (y or n) y
+
+### 1.5 How do I get help on debugger commands? [top]
+
+Use the **help** command. Gdb has a description for every command it
+understand, and there are many, many more then this tutorial covers. The
+argument to help is the command you want information about. If you just type
+"help" with no arguments, you will get a list of help topics similar to the
+following:
+
+    (gdb) help
+    List of classes of commands:
+    aliases      -- Aliases of other commands
+    breakpoints  -- Making program stop at certain points
+    data         -- Examining data
+    files        -- Specifying and examining files
+    internals    -- Maintenance commands
+    obscure      -- Obscure features
+    running      -- Running the program
+    stack        -- Examining the stack
+    status       -- Status inquiries
+    support      -- Support facilities
+    tracepoints  -- Tracing of program execution without stopping the program
+    user-defined -- User-defined commands
+
+    Type "help" followed by a class name for a list of commands in that class.
+    Type "help" followed by command name for full documentation.
+    Command name abbreviations are allowed if unambiguous.
+
+* * *
+
+#  2. How do I watch the execution of my program?
+<a name="execution"></a>
+
+* * *
+
+### 2.1 How do I stop execution? [top]
+<a name="step1"></a>
+
+You can stop execution by sending your program UNIX symbols like SIGINT. This
+is done using the **Ctrl-C** key combination. In the following example, I
+pressed Ctrl-C after 'Starting Program...' appeared.
+
+    (gdb) run
+    Starting Program: /home/ug/ryansc/a.out
+    Program received signal SIGINT, Interrupt.
+    0x80483b4 in main(argc=1, argv=0xbffffda4) at loop.c:5
+    5   while(1){
+    ...
+    (gdb)
+
+### 2.2 How do I continue execution? [top]
+<a name="step2"></a>
+
+Use the **continue** command to restart execution of your program whenever it
+is stopped.
+
+### 2.3 How do I see where my program stopped? [top]
+<a name="step3"></a>
+
+Use the **list** command to have gdb print out the lines of code above and
+below the line the program is stopped at. In the example below, the breakpoint
+is on line 8.
+
+    (gdb) list
+    3       int main(int argc, char **argv)
+    4       {
+    5         int x = 30;
+    6         int y = 10;
+    7
+    8         x = y;
+    9
+    10        return 0;
+    11      }
+
+### 2.4 How do I step through my code line-by-line? [top]
+<a name="step4"></a>
+
+First stop your program by sending it signals or using breakpoints. Then use
+the **next** and **step** commands.
+
+    5   while(1){
+    (gdb) next
+    7   }
+    (gdb)
+
+*NOTE* the next and step commands are different. On a line of code that has a function call, next will go 'over' the function call to the next line of code, while step will go 'into' the function call. 
+
+The **next** command:
+
+    (gdb)
+    11     fun1();
+    (gdb) next
+    12 }
+
+The **step** command:
+
+    (gdb)
+    11     fun1();
+    (gdb) step;
+    fun1 () at loop.c:5
+    5    return 0;
+    (gdb)
+
+### 2.5 How do I examine variables? [top]
+<a name="step5"></a>
+
+Use the **print** command with a variable name as the argument. For example,
+if you have `int x` and `char *s`:
+
+    (gdb) print x
+    $1 = 900
+    (gdb) print s
+    $3 = 0x8048470 "Hello World!\n"
+    (gdb)
+
+NOTE: The output from the print command is always formatted $## = (value). The
+$## is simply a counter that keeps track of the variables you have examined.
+
+### 2.6 How do I modify variables? [top]
+<a name="step6"></a>
+
+Use the **set** command with a C assignment statement as the argument. For
+example, to change `int x` to have the value 3:
+
+    (gdb) set x = 3
+    (gdb) print x
+    $4 = 3
+
+NOTE: in newer versions of gdb, it may be necessary to use the command 'set
+var', as in 'set var x = 3'
+
+### 2.7 How do I call functions linked into my program? [top]
+<a name="step7"></a>
+
+From the debugger command line you can use the **call** command to call any
+function linked into the program. This includes your own code as well as
+standard library functions. For example, if you wish to have your program dump
+core:
+
+(gdb) call abort()
+
+### 2.8 How do I return from a function? [top]
+<a name="step8"></a>
+
+Use the **finish** command to have a function finish executing and return to
+it's caller. This command also shows you what value the function returned.
+
+    (gdb) finish
+    Run till exit from #0  fun1 () at test.c:5
+    main (argc=1, argv=0xbffffaf4) at test.c:17
+    17        return 0;
+    Value returned is $1 = 1
+
+3. How do I use the call stack?
+===============================
+
+### 3.1 How do I get a backtrace?
+<a name="BACKTRACE"></a>
+
+Use the gdb command **backtrace**. In the backtrace below, we can see
+that we are currently inside `func2()`, which was called bu `func1()`,
+which was called from `main()`
+
+>
+>     (gdb) backtrace
+>     #0  func2 (x=30) at test.c:5
+>     #1  0x80483e6 in func1 (a=30) at test.c:10
+>     #2  0x8048414 in main (argc=1, argv=0xbffffaf4) at test.c:19
+>     #3  0x40037f5c in __libc_start_main () from /lib/libc.so.6
+>     (gdb) 
+
+### 3.2 How do I change stack frames?
+<a name="CHFRAME"></a>
+
+Use the gdb command **frame**. Notice in the backtrace above that each
+frame has a number beside it. Pass the number of the frame you want as
+an argument to the command.
+
+>
+>     (gdb) frame 2
+>     #2  0x8048414 in main (argc=1, argv=0xbffffaf4) at test.c:19
+>     19        x = func1(x);
+>     (gdb) 
+
+### 3.3 How do I examine stack frames?
+<a name="EXAMINE"></a>
+
+To look at the contents of the current frame, there are 3 useful gdb
+commands. **info frame** displays information about the current stack
+frame. **info locals** displays the list of local variables and their
+values for the current stack frame, and **info args** displays the list
+of arguments.
+
+>
+>     (gdb) info frame
+>     Stack level 2, frame at 0xbffffa8c:
+>      eip = 0x8048414 in main (test.c:19); saved eip 0x40037f5c
+>      called by frame at 0xbffffac8, caller of frame at 0xbffffa5c
+>      source language c.
+>      Arglist at 0xbffffa8c, args: argc=1, argv=0xbffffaf4
+>      Locals at 0xbffffa8c, Previous frame's sp is 0x0
+>      Saved registers:
+>       ebp at 0xbffffa8c, eip at 0xbffffa90
+
+>
+>     (gdb) info locals
+>     x = 30
+>     s = 0x8048484 "Hello World!\n"
+
+>
+>     (gdb) info args
+>     argc = 1
+>     argv = (char **) 0xbffffaf4
+
+* * *
+#  4. How do I use breakpoints?
+
+### 4.1 How do I set a breakpoint on a line? [top]
+<a name="setb"></a>
+
+The command to set a breakpoint is **break**. If you only have one source
+file, you can set a breakpoint like so:
+
+    (gdb) break 19
+    Breakpoint 1 at 0x80483f8: file test.c, line 19
+
+If you have more than one file, you must give the **break** command a filename
+as well:
+
+    (gdb) break test.c:19
+    Breakpoint 2 at 0x80483f8: file test.c, line 19
+
+### 4.2 How do I set a breakpoint on a C function? [top]
+<a name="setc"></a>
+
+To set a breakpoint on a C function, pass it's name to break.
+
+    (gdb) break func1
+    Breakpoint 3 at 0x80483ca: file test.c, line 10
+
+### 4.3 How do I set a breakpoint on a C++ function? [top]
+<a name="setd"></a>
+
+Setting a breakpoint on a C++ function is similar to setting a breakpoint on a
+C function. However C++ is polymorphic, so you must tell break which version
+of the function you want to break on (even if there is only one). To do this,
+you tell it the list of argument types.
+
+    (gdb) break TestClass::testFunc(int)
+    Breakpoint 1 at 0x80485b2: file cpptest.cpp, line 16.
+
+### 4.4 How do I set a temporary breakpoint? [top]
+<a name="sete"></a>
+
+Use the **tbreak** command instead of break. A temporary breakpoint only stops
+the program once, and is then removed.
+
+### 4.5 How do I get a list of breakpoints? [top]
+<a name="setf"></a>
+
+Use the **info breakpoints** command.
+
+    (gdb) info breakpoints
+
+    Num Type           Disp Enb Address    What
+    2   breakpoint     keep y   0x080483c3 in func2 at test.c:5
+    3   breakpoint     keep y   0x080483da in func1 at test.c:10
+
+### 4.6 How do I disable breakpoints? [top]
+<a name="setg"></a>
+
+Use the **disable** command. Pass the number of the breakpoint you wish to
+disable as an argument to this command. You can find the breakpoint number in
+the list of breakpoints, as shown above. In the example below we can see that
+breakpoint number 2 has been disabled (there is an 'n' under the Enb column).
+
+    (gdb) disable 2
+    (gdb) info breakpoints
+
+    Num Type           Disp Enb Address    What
+    2   breakpoint     keep n   0x080483c3 in func2 at test.c:5
+    3   breakpoint     keep y   0x080483da in func1 at test.c:10
+
+### 4.7 How do I skip breakpoints? [top]
+<a name="seth"></a>
+
+To skip a breakpoint a certain number of times, we use the **ignore** command.
+The **ignore** command takes two arguments: the breakpoint number to skip, and
+the number of times to skip it.
+
+    (gdb) ignore 2 5
+    Will ignore next 5 crossings of breakpoint 2.
+
+* * * * *
+
+5. How do I use watchpoints?
+============================
+
+### 5.1 How do I set a write watchpoint for a variable?
+<a name="WRITE"></a>
+
+Use the **watch** command. The argument to the watch command is an
+expression that is evaluated. This implies that the variabel you want to
+set a watchpoint on must be in the current scope. So, to set a
+watchpoint on a non-global variable, you must have set a breakpoint that
+will stop your program when the variable is in scope. You set the
+watchpoint after the program breaks.
+
+\*NOTE\* You may notice in the example below that the line of code
+printed doesn't match with the line that changes the variable x. This is
+because the store instruction that sets off the watchpoint is the last
+in the sequence necessary to do the 'x=y' assignment. So the debugger
+has already gone on to the next line of code. In the examples, a
+breakpoint has been set on the 'main' function and has been triggered to
+stop the program.
+
+>
+>     (gdb) watch x
+>     Hardware watchpoint 4: x
+>     (gdb) c
+>     Continuing.
+>     Hardware watchpoint 4: x
+>
+>     Old value = -1073743192
+>     New value = 11
+>     main (argc=1, argv=0xbffffaf4) at test.c:10
+>     10      return 0;
+
+
+### 5.2 How do I set a read watchpoint for a variable?
+<a name="READ"></a>
+
+Use the **rwatch** command. Usage is identical to the watch command.
+
+>
+>     (gdb) rwatch y 
+>     Hardware read watchpoint 4: y
+>     (gdb) continue
+>     Continuing.
+>     Hardware read watchpoint 4: y
+>
+>     Value = 1073792976
+>     main (argc=1, argv=0xbffffaf4) at test.c:8
+>     8         x = y;
+
+### 5.3 How do I set a read/write watchpoint for a variable?
+<a name="RDWR"></a>
+
+Use the **awatch** command. Usage is identical to the watch command.
+
+### 5.4 How do I disable watchpoints?
+<a name="DISABLE"></a>
+
+Active watchpoints show up the breakpoint list. Use the **info
+breakpoints** command to get this list. Then use the **disable** command
+to turn off a watchpoint, just like disabling a breakpoint.
+
+>
+>     (gdb) info breakpoints
+>     Num Type           Disp Enb Address    What
+>     1   breakpoint     keep y   0x080483c6 in main at test.c:5
+>             breakpoint already hit 1 time
+>     4   hw watchpoint  keep y   x
+>             breakpoint already hit 1 time
+>     (gdb) disable 4
+
+* * * * *
+
+6. Advanced gdb Features
+========================
+
+### 6.1 How do I examine memory?
+<a name="MEMORY"></a>
+
+Use the **x** command to examine memory. The syntax for the x command is
+x/FMT ADDRESS. The FMT field is a count followed by a format letter and
+a size letter. There are many options here, use the help command 'help
+x' to see them all. The ADDRESS argument can either be a symbol name,
+such as a variable, or a memory address.
+
+If we have `char *s = "Hello World\n"`, some uses of the x command could
+be:
+
+Examine the variable as a string:
+
+>
+>     (gdb) x/s s
+>     0x8048434 <_IO_stdin_used+4>:    "Hello World\n"
+
+Examine the variable as a character:
+
+>
+>     (gdb) x/c s
+>     0x8048434 <_IO_stdin_used+4>:   72 'H'
+
+Examine the variable as 4 characters:
+
+>
+>     (gdb) x/4c s
+>     0x8048434 <_IO_stdin_used+4>:   72 'H'  101 'e' 108 'l' 108 'l'
+
+Examine the first 32 bits of the variable:
+
+>
+>     (gdb) x/t s
+>     0x8048434 <_IO_stdin_used+4>:   01101100011011000110010101001000
+
+Examine the first 24 bytes of the variable in hex:
+
+>
+>     (gdb) x/3x s
+>     0x8048434 <_IO_stdin_used+4>:   0x6c6c6548      0x6f57206f      0x0a646c72
+
+
+### 6.2 How do I see what is in the processor registers?
+<a name="REGISTERS"></a>
+
+Use the **info registers** command. The output of this command depends
+on the hardware architecture. The following is part of the output on an
+intel machine:
+
+>
+>     (gdb) info registers
+>     eax            0x40123460       1074934880
+>     ecx            0x1      1
+>     edx            0x80483c0        134513600
+>     ebx            0x40124bf4       1074940916
+>     esp            0xbffffa74       0xbffffa74
+>     ebp            0xbffffa8c       0xbffffa8c
+>     esi            0x400165e4       1073833444
+>     ...
+
+
+### 6.3 How do I debug with a core file?
+<a name="CORE"></a>
+
+When your program segfaults and leaves a core dump file, you can use gdb
+to look at the program state when it crashed. Use the **core** command
+to load a core file. The argument to the core command is the filename of
+the core dump file, which is usually "core", making the full command
+**core core**.
+
+>
+>     prompt > myprogram
+>     Segmentation fault (core dumped)
+>     prompt > gdb myprogram
+>     ...
+>     (gdb) core core
+>     ...
+
+
+### 6.4 How do I step through my code at the instruction level?
+<a name="STEPI"></a>
+
+There are two commands, **nexti** and **stepi**, that work similar to
+**next** and **step**. See the usage of those commands for an idea of
+how to use these two.
+
+
+### 6.5 How do I see the assembly code my program is running?
+<a name="DISASS"></a>
+
+Use the **disassemble** command. The argument to this command is a
+memory address. Here is an example of the disassembly for the main
+function of a simple program on an intel machine:
+
+>
+>     (gdb) disassemble main
+>     Dump of assembler code for function main:
+>     0x80483c0 <main>:       push   %ebp
+>     0x80483c1 <main+1>:     mov    %esp,%ebp
+>     0x80483c3 <main+3>:     sub    $0x18,%esp
+>     0x80483c6 <main+6>:     movl   $0x0,0xfffffffc(%ebp)
+>     0x80483cd <main+13>:    mov    0xfffffffc(%ebp),%eax
+>     0x80483d0 <main+16>:    movb   $0x7,(%eax)
+>     0x80483d3 <main+19>:    xor    %eax,%eax
+>     0x80483d5 <main+21>:    jmp    0x80483d7 <main+23>
+>     0x80483d7 <main+23>:    leave  
+>     0x80483d8 <main+24>:    ret    
+>     End of assembler dump.
+
+* * *
+

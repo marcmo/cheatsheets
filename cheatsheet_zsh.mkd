@@ -1,0 +1,22 @@
+## rerun the last command with a replace in one swoop:
+
+    !!:s/find it/replace it/
+
+## That'll do the first match, but to replace all matches on the line:
+
+    !!:gs/gotta/replace them all/
+
+## rake tasks
+
+Unfortunately, by default zsh can’t parse the call to the rake task correctly, so you’ll see the error:
+
+    zsh: no matches found: tweets:send[cpytel]
+
+So you’ll need to run it like this:
+
+    rake tweets:send\[cpytel\]
+
+Or this:
+
+    rake 'tweets:send[cpytel]'
+

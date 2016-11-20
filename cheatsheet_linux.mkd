@@ -1,0 +1,74 @@
+# In Unix, how do I find a user's UID or GID?
+
+## find a user's UID or GID
+
+    id -u username
+
+## find a user's GID
+
+    id -g username
+
+## find out all the groups a user belongs to
+
+    id -G username
+
+## see the UID and all groups associated with a user
+
+    id username
+
+# Users
+
+## add user without login shell and home directory
+
+    sudo adduser --system --no-create-home --disabled-login --disabled-password --group nginx
+
+## delete user
+
+    /usr/sbin/userdel -r baduser
+
+# Groups
+
+## add existing user to group
+
+    sudo usermod -a -G nginx myuser
+
+## check the groups a user belongs to
+
+    groups myuser
+
+## login as different user
+
+    $ whoami
+    user1
+    $ sudo su - user2
+    Password:
+    $ whoami
+    user2
+    $ exit
+    logout
+
+
+# chmod
+
+### make file executable
+
+    chmod 755 myScript.sh
+
+### change permissions recursively for directory
+
+    chmod -R 755 dirName
+
+## permission flags
+
+    drwxr-xr-x 3 ethanhunt user   2008 May 23 08:57 tmp
+     +--|  |    user
+        +--|    group
+           +--  other
+
+### add write permission for group to "myfile"
+
+    chmod g+w myfile
+
+
+
+
